@@ -1,0 +1,44 @@
+.slider {
+  position: relative;
+  width: 100%; /* Full width */
+  height: 500px;
+  margin: 2rem 0; /* Margin on top and bottom */
+  overflow: hidden;
+  border-radius: 10px;
+}
+
+.slide-img {
+  width: 100%; /* Full width */
+  height: 100%;
+  display: block;
+  transition: all 0.5s ease-in-out;
+}
+
+.slider-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  font-size: 2rem;
+  border: none;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  z-index: 2;
+  border-radius: 50%;
+}
+
+.slider-btn.left {
+  left: 10px;
+}
+
+.slider-btn.right {
+  right: 10px;
+}
+
+@media (max-width: 768px) {
+  .slider-btn {
+    font-size: 1.5rem;
+    padding: 0.3rem 0.6rem;
+  }
+}
