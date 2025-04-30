@@ -1264,14 +1264,15 @@ img {
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #f3f4f6; /* optional: light gray background for gaps */
+  background-color: #f3f4f6; /* optional background fill */
 }
 
 .team-image img {
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: contain;
+  width: auto;
+  height: 100%;
+  object-fit: cover;
 }
+
 
 .team-name {
   font-size: 1.25rem;
