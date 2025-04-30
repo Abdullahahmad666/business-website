@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import "./Slider.css";
 
 const images = [
-  "/asuppal/ware.jpg",
+  "/asuppal/www.png",
   "/asuppal/hehe.png",
 ];
 
