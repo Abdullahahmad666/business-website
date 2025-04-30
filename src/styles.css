@@ -1257,7 +1257,6 @@ img {
 .team-image {
   width: 160px;
   height: 160px;
-  border-radius: 50%;
   overflow: hidden;
   margin-bottom: 1.5rem;
   border: 3px solid #f59e0b;
