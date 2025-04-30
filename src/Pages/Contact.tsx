@@ -165,8 +165,8 @@ const handleSubmit = (e: React.FormEvent) => {
                   </div>
                   <h2 className="contact-heading">CONTACT US</h2>
                   <div className="contact-text">
-                    <a href="mailto:sohaibuppal65@gmail.com" className="text-black hover:underline">
-                      sohaibuppal65@gmail.com
+                    <a href="mailto:info@asuppaltradinggmbh.com" className="text-black hover:underline">
+                    info@asuppaltradinggmbh.com
                     </a>
                   </div>
                 </div>
