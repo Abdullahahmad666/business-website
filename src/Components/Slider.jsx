@@ -3,7 +3,7 @@ import "./Slider.css";
 
 const images = [
   "/asuppal/www.png",
-  "/asuppal/hehe.png",
+  "/asuppal/wa.png",
 ];
 
 const Slider = () => {
