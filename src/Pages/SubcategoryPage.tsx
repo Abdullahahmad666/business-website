@@ -121,6 +121,20 @@ const subcategoriesData = {
         image: "/asuppal/ironscrap.jpg",
         link: "/products/iron-scrap",
       },
+      {
+        id: "compressor-scrap",
+        name: "Compressor SCRAP",
+        count: 6,
+        image: "/asuppal/compressor.jpg",
+        link: "/products/compressor-scrap",
+      },
+      {
+        id: "aluminium-scrap",
+        name: "Aluminium SCRAP",
+        count: 6,
+        image: "/asuppal/aluminium.jpg",
+        link: "/products/aluminium-scrap",
+      },
     ],
   },
 }
