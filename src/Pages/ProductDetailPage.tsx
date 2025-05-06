@@ -317,7 +317,7 @@ const productsData = {
       },
       images: [
         "/asuppal/compressorscrap.jpg",
-        "/asuppal/compressor.jpg",
+        "/asuppal/compressor.jpeg",
       
         
       ],
@@ -342,7 +342,7 @@ const productsData = {
       },
       images: [
         "/asuppal/aluminium-scrap.jpg",
-        "/asuppal/aluminium.jpg",
+        "/asuppal/aluminium.jpeg",
       
         
       ],
