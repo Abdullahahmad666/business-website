@@ -26,6 +26,13 @@ const subcategoriesData = {
         image: "/asuppal/accidental.jpg",
         link: "/products/accidental-cars",
       },
+      {
+        id: "construction-trucks",
+        name: "Construction Trucks",
+        count: 8,
+        image: "/asuppal/constructiontrucks.jpg",
+        link: "/products/construction-trucks",
+      },
     ],
   },
   laptop: {

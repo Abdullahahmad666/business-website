@@ -57,6 +57,32 @@ const productsData = {
       ],
     },
   ],
+  "construction-trucks": [
+    {
+      id: 1,
+      name: "Construction Trucks",
+      price: "Price Varying",
+      description:
+        "Explore our range of construction trucks, designed for heavy-duty tasks. Ideal for construction sites, transportation of materials, and industrial use. Reliable and durable vehicles to meet your business needs.",
+      specifications: {
+        Condition: "New/Used",
+        Year: "2000 - 2024",
+        Make: "All Companies",
+        Model: "All Models",
+        Mileage: "10,000 km - 60,000 km",
+        "Fuel Type": "Petrol/Diesel/Hybrid",
+        Transmission: "Automatic/Manual",
+        Color: "Different Colors available",
+        
+      },
+      images: [
+        "/asuppal/truck.jpg",
+        "/asuppal/trucks.jpg",
+        "/asuppal/constructiontrucks.jpg",
+       
+      ],
+    },
+  ],
   "used-laptops": [
     {
       id: 1,
