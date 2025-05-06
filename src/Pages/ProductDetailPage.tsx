@@ -298,6 +298,56 @@ const productsData = {
       ],
     },
   ],
+  "compressor-scrap": [
+    {
+      id: 1,
+      name: "Compressor Scrap",
+      price: "Price Vary",
+      description:
+        "High-grade Compressor scrap material sourced from industrial electrical components. This Compressor scrap is 99% pure and ideal for recycling and manufacturing applications. We ensure proper sorting and cleaning of all materials before delivery. Available in large quantities for industrial buyers.",
+      specifications: {
+        Type: "Compressor Scrap",
+        Purity: "99%",
+        Source: "Industrial Electrical",
+        Form: "Wire and Components",
+        Packaging: "1-ton bags",
+        "Minimum Order": "5 tons",
+        "Price Basis": "LME - 10%",
+        Delivery: "FOB Port",
+      },
+      images: [
+        "/asuppal/compressorscrap.jpg",
+        "/asuppal/compressor.jpg",
+      
+        
+      ],
+    },
+  ],
+  "aluminium-scrap": [
+    {
+      id: 1,
+      name: "Aluminium Scrap",
+      price: "Price Vary",
+      description:
+        "High-grade Aluminium scrap material sourced from industrial electrical components. This Aluminium scrap is 99% pure and ideal for recycling and manufacturing applications. We ensure proper sorting and cleaning of all materials before delivery. Available in large quantities for industrial buyers.",
+      specifications: {
+        Type: "Aluminium Scrap",
+        Purity: "99%",
+        Source: "Industrial Electrical",
+        Form: "Wire and Components",
+        Packaging: "1-ton bags",
+        "Minimum Order": "5 tons",
+        "Price Basis": "LME - 10%",
+        Delivery: "FOB Port",
+      },
+      images: [
+        "/asuppal/aluminium-scrap.jpg",
+        "/asuppal/aluminium.jpg",
+      
+        
+      ],
+    },
+  ],
 }
 
 function ProductDetailPage() {
