@@ -341,7 +341,7 @@ const productsData = {
         Delivery: "FOB Port",
       },
       images: [
-        "/asuppal/aluminium-scrap.jpg",
+        "/asuppal/aluminum-scrap.jpg",
         "/asuppal/aluminium.jpeg",
       
         
