@@ -8,7 +8,7 @@ const categories = [
     {
       id: 1,
       name: "CARS",
-      count: 2,
+      count: 3,
       image: "/asuppal/carcategory.jpg",
       link: "/categories/cars",
     },
@@ -36,7 +36,7 @@ const categories = [
     {
       id: 5,
       name: "SCRAP",
-      count: 3,
+      count: 5,
       image: "/asuppal/scrapcategory.jpg",
       link: "/categories/scrap",
     },
