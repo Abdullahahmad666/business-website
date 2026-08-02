@@ -217,7 +217,7 @@ export default function SubcategoryPage() {
               <p className="max-w-xl text-[1.0625rem] leading-relaxed text-bone/55">
                 {entry.description}
               </p>
-              <dl className="flex shrink-0 gap-10 font-mono">
+              <dl className="flex flex-wrap gap-x-8 gap-y-5 font-mono sm:gap-x-10 lg:shrink-0 lg:flex-nowrap">
                 <div>
                   <dt className="text-[0.625rem] uppercase tracking-[0.2em] text-bone/40">Lines</dt>
                   <dd className="mt-1.5 font-display text-3xl font-bold text-gold">

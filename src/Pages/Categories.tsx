@@ -81,7 +81,10 @@ export default function CategoriesPage() {
               </ol>
             </nav>
 
-            <h1 className="mt-8 font-display text-[clamp(2.5rem,7vw,5.5rem)] font-bold uppercase leading-[0.9] tracking-[-0.02em] text-bone">
+            {/* Floor is 2rem, not 2.5rem: "Collections" is a single
+                unbreakable word, and at 2.5rem it is wider than a 360px
+                viewport, which scrolls the whole page sideways. */}
+            <h1 className="mt-8 font-display text-[clamp(2rem,7vw,5.5rem)] font-bold uppercase leading-[0.9] tracking-[-0.02em] text-bone">
               Collections
             </h1>
 
@@ -90,7 +93,10 @@ export default function CategoriesPage() {
                 Five classes of goods, moved in container quantities out of Mainz.
                 Open a class to see the lines we carry and what's currently on the book.
               </p>
-              <dl className="flex shrink-0 gap-10 font-mono">
+              {/* Wraps and tightens on narrow screens — the mono labels carry
+                  0.2em tracking, so three of them at a fixed gap-10 overflow
+                  a 360px viewport. shrink-0 only applies once side by side. */}
+              <dl className="flex flex-wrap gap-x-8 gap-y-5 font-mono sm:gap-x-10 lg:shrink-0 lg:flex-nowrap">
                 <div>
                   <dt className="text-[0.625rem] uppercase tracking-[0.2em] text-bone/40">
                     Classes
