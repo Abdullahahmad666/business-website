@@ -122,12 +122,16 @@ export const COMMODITIES: string[] = [
   "Cooking Oil",
 ];
 
-/** Figures carried over from the original About Us page, unchanged. */
+/**
+ * Figures carried over from the original About Us page, unchanged in value.
+ * Stored as numbers rather than "960+" strings so the counter can animate to
+ * them exactly; the suffix is rendered separately.
+ */
 export const TRACK_RECORD = [
-  { label: "Scrap", value: "960+" },
-  { label: "Laptops", value: "860+" },
-  { label: "Nuts", value: "750+" },
-  { label: "Cooking Oil", value: "520+" },
+  { label: "Scrap", value: 960, suffix: "+" },
+  { label: "Laptops", value: 860, suffix: "+" },
+  { label: "Nuts", value: 750, suffix: "+" },
+  { label: "Cooking Oil", value: 520, suffix: "+" },
 ] as const;
 
 export type Testimonial = {

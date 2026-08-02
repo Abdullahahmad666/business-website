@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { Reveal, RevealGroup, RevealItem } from "../Components/ui/Reveal.tsx";
 import { SpecLabel } from "../Components/ui/Manifest.tsx";
+import { CountUp } from "../Components/ui/CountUp.tsx";
 import { TEAM, TRACK_RECORD, CONTACT } from "../data/company.ts";
 import { cn } from "../lib/utils.ts";
 
@@ -218,9 +219,11 @@ export default function AboutUs() {
           <RevealGroup className="mt-14 grid gap-px border border-bone-line bg-bone-line sm:grid-cols-2 lg:grid-cols-4">
             {TRACK_RECORD.map((stat) => (
               <RevealItem key={stat.label} className="bg-white p-8 lg:p-10">
-                <p className="font-display text-[clamp(2.5rem,5vw,3.5rem)] font-bold leading-none tracking-[-0.02em] text-ink">
-                  {stat.value}
-                </p>
+                <CountUp
+                  value={stat.value}
+                  suffix={stat.suffix}
+                  className="font-display text-[clamp(2.5rem,5vw,3.5rem)] font-bold leading-none tracking-[-0.02em] text-ink"
+                />
                 <p className="mt-4 font-mono text-[0.6875rem] uppercase tracking-[0.2em] text-gold-deep">
                   {stat.label}
                 </p>
