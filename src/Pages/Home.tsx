@@ -1,468 +1,544 @@
-import React from "react"
-import { Link } from "react-router"
-import Header from "../Components/Header.tsx"
-import Footer from "../Components/Footer.tsx"
-import Slider from "../Components/Slider.jsx"
-// Ensure the file exists at the specified path or remove this line if not needed
-import { Mail, Phone, Clock, Twitter, Facebook, Instagram } from "lucide-react"
+import React, { useState } from "react";
+import { Link } from "react-router";
+import {
+  ArrowRight,
+  ArrowUpRight,
+  Boxes,
+  Mail,
+  Phone,
+  Search,
+  Ship,
+  Truck,
+} from "lucide-react";
+import { Reveal, RevealGroup, RevealItem } from "../Components/ui/Reveal.tsx";
+import { Marquee } from "../Components/ui/Marquee.tsx";
+import { Testimonials } from "../Components/ui/Testimonials.tsx";
+import { SpecLabel } from "../Components/ui/Manifest.tsx";
+import { BOOK, COMMODITIES, CONTACT, TEAM, TESTIMONIALS } from "../data/company.ts";
+import { cn } from "../lib/utils.ts";
 
-function Home() {
+const SERVICES = [
+  {
+    icon: Boxes,
+    title: "Bulk purchasing",
+    body: "We buy in container quantities from vetted suppliers, so the price you get reflects the volume we move rather than a middleman's margin.",
+  },
+  {
+    icon: Ship,
+    title: "Import & export",
+    body: "Documentation, freight booking and customs handled end to end between Europe, the Gulf and South Asia.",
+  },
+  {
+    icon: Truck,
+    title: "Wholesale distribution",
+    body: "Stock broken down and delivered to retailers and processors at wholesale pricing.",
+  },
+  {
+    icon: Search,
+    title: "Sourcing & research",
+    body: "Tell us the specification you need and we'll find who has it, what it costs and how quickly it can load.",
+  },
+];
+
+const FEATURED = [
+  {
+    name: "Motor Scrap",
+    image: "/asuppal/motorscrap.jpg",
+    to: "/products/motor-scrap",
+    body: "Electric motors bought by the tonne for copper recovery and remanufacture.",
+  },
+  {
+    name: "Walnuts",
+    image: "/asuppal/walnut.jpg",
+    to: "/products/walnuts",
+    body: "In-shell and kernel walnuts, graded and packed for export.",
+  },
+  {
+    name: "Laptops",
+    image: "/asuppal/usedlap.jpg",
+    to: "/products/used-laptops",
+    body: "Working stock and scrap units for refurbishment or component recovery.",
+  },
+];
+
+const MISSION_IMAGES = [
+  { src: "/asuppal/usedcar.jpg", alt: "Used cars ready for export" },
+  { src: "/asuppal/alumland.jpg", alt: "Baled aluminium scrap" },
+  { src: "/asuppal/walnut.jpg", alt: "Walnuts graded for packing" },
+  { src: "/asuppal/oilland.jpg", alt: "Cooking oil in bulk containers" },
+];
+
+/* ── Hero ─────────────────────────────────────────────────────── */
+
+function Hero() {
   return (
-    <div className="flex flex-col min-h-screen">
-    {/* Top Bar */}
-    <div className="top-bar">
-      <div className="top-bar-left">
-        <div className="top-bar-item space-x-6">
-          <div className="top-bar-item">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="top-bar-icon"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
-              />
-            </svg>
-            <span>+49 162 9775400</span>
-          </div>
-          <div className="top-bar-item">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="top-bar-icon"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-            <span>Mon - Sun</span>
-          </div>
-        </div>
-      </div>
-      <div className="top-bar-right">
-        <div className="top-bar-item space-x-4">
-          <div className="top-bar-item">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="top-bar-icon"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-              />
-            </svg>
-            <a href="mailto:info@asuppaltradinggmbh.com">info@asuppaltradinggmbh.com</a>
-          </div>
-          <div className="top-bar-item space-x-2">
-            <a href="#" aria-label="Twitter">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                <path d="M5.026 15c6.038 0 9.341-5.003 9.341-9.334 0-.14 0-.282-.006-.422A6.685 6.685 0 0 0 16 3.542a6.658 6.658 0 0 1-1.889.518 3.301 3.301 0 0 0 1.447-1.817 6.533 6.533 0 0 1-2.087.793A3.286 3.286 0 0 0 7.875 6.03a9.325 9.325 0 0 1-6.767-3.429 3.289 3.289 0 0 0 1.018 4.382A3.323 3.323 0 0 1 .64 6.575v.045a3.288 3.288 0 0 0 2.632 3.218 3.203 3.203 0 0 1-.865.115 3.23 3.23 0 0 1-.614-.057 3.283 3.283 0 0 0 3.067 2.277A6.588 6.588 0 0 1 .78 13.58a6.32 6.32 0 0 1-.78-.045A9.344 9.344 0 0 0 5.026 15z" />
-              </svg>
-            </a>
-            <a href="#" aria-label="Facebook">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                <path d="M16 8.049c0-4.446-3.582-8.05-8-8.05C3.58 0-.002 3.603-.002 8.05c0 4.017 2.926 7.347 6.75 7.951v-5.625h-2.03V8.05H6.75V6.275c0-2.017 1.195-3.131 3.022-3.131.876 0 1.791.157 1.791.157v1.98h-1.009c-.993 0-1.303.621-1.303 1.258v1.51h2.218l-.354 2.326H9.25V16c3.824-.604 6.75-3.934 6.75-7.951z" />
-              </svg>
-            </a>
-            <a href="#" aria-label="Instagram">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                <path d="M8 0C5.829 0 5.556.01 4.703.048 3.85.088 3.269.222 2.76.42a3.917 3.917 0 0 0-1.417.923A3.927 3.927 0 0 0 .42 2.76C.222 3.268.087 3.85.048 4.7.01 5.555 0 5.827 0 8.001c0 2.172.01 2.444.048 3.297.04.852.174 1.433.372 1.942.205.526.478.972.923 1.417.444.445.89.719 1.416.923.51.198 1.09.333 1.942.372C5.555 15.99 5.827 16 8 16s2.444-.01 3.298-.048c.851-.04 1.434-.174 1.943-.372a3.916 3.916 0 0 0 1.416-.923c.445-.445.718-.891.923-1.417.197-.509.332-1.09.372-1.942C15.99 10.445 16 10.173 16 8s-.01-2.445-.048-3.299c-.04-.851-.175-1.433-.372-1.941a3.926 3.926 0 0 0-.923-1.417A3.911 3.911 0 0 0 13.24.42c-.51-.198-1.092-.333-1.943-.372C10.443.01 10.172 0 7.998 0h.003zm-.717 1.442h.718c2.136 0 2.389.007 3.232.046.78.035 1.204.166 1.486.275.373.145.64.319.92.599.28.28.453.546.598.92.11.281.24.705.275 1.485.039.843.047 1.096.047 3.231s-.008 2.389-.047 3.232c-.035.78-.166 1.203-.275 1.485a2.47 2.47 0 0 1-.599.919c-.28.28-.546.453-.92.598-.28.11-.704.24-1.485.276-.843.038-1.096.047-3.232.047s-2.39-.009-3.233-.047c-.78-.036-1.203-.166-1.485-.276a2.478 2.478 0 0 1-.92-.598 2.48 2.48 0 0 1-.6-.92c-.109-.281-.24-.705-.275-1.485-.038-.843-.046-1.096-.046-3.233 0-2.136.008-2.388.046-3.231.036-.78.166-1.204.276-1.486.145-.373.319-.64.599-.92.28-.28.546-.453.92-.598.282-.11.705-.24 1.485-.276.738-.034 1.024-.044 2.515-.045v.002zm4.988 1.328a.96.96 0 1 0 0 1.92.96.96 0 0 0 0-1.92zm-4.27 1.122a4.109 4.109 0 1 0 0 8.217 4.109 4.109 0 0 0 0-8.217zm0 1.441a2.667 2.667 0 1 1 0 5.334 2.667 2.667 0 0 1 0-5.334z" />
-              </svg>
-            </a>
-          </div>
-        </div>
-      </div>
-    </div>
+    <section className="relative isolate overflow-hidden bg-ink">
+      <img
+        src="/asuppal/scrapabout.jpg"
+        alt=""
+        className="absolute inset-0 -z-10 size-full object-cover opacity-45"
+      />
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 -z-10 bg-gradient-to-br from-ink via-ink/85 to-ink/40"
+      />
+      <div
+        aria-hidden="true"
+        className="absolute inset-x-0 bottom-0 -z-10 h-40 bg-gradient-to-t from-ink to-transparent"
+      />
 
-    {/* Logo Section */}
-    <div className="logo-section">
-  <div className="logo-container">
-    <div className="logo-image">
-      <img src="/asuppal/logo.jpg" alt="AS Uppal Logo" />
-    </div>
-  </div>
-</div>
+      <div className="mx-auto max-w-[84rem] px-6 pb-14 pt-20 lg:px-10 lg:pb-20 lg:pt-28">
+        <Reveal>
+          <SpecLabel>A.S. Uppal Trading GmbH · Mainz, DE</SpecLabel>
+        </Reveal>
 
-    {/* Navigation */}
-    <Header />
-    {/* Slider */}
-    <Slider />
+        <Reveal delay={0.08}>
+          <h1 className="mt-8 max-w-[70rem] font-display text-[clamp(2.25rem,6vw,5rem)] font-bold uppercase leading-[0.9] tracking-[-0.025em] text-bone">
+            Metal, machines and produce —
+            <span className="block text-gold">moved by the container.</span>
+          </h1>
+        </Reveal>
 
-   {/* Hero Section */}
-   <section className="hero-section">
-        <div className="hero-grid">
-          {/* About Us */}
-          <div className="about-us-block">
-            <h2 className="section-title">ABOUT US</h2>
-            <p className="section-text">
-              We are a reliable supplier & purchaser dedicated to offering high-quality products in bulk
-            </p>
-            <p className="section-text">
-              We are a trusted Supplier & Purchaser offering a wide range of products in bulk. With a strong focus on
-              quality and competitive pricing, we cater to the diverse needs of businesses and individuals. Our
-              extensive stock ensures timely delivery and reliable service. We are committed to providing the best value
-              and customer satisfaction.
-            </p>
-            <Link to="/about" className="primary-button">
-              Learn about us
+        <Reveal delay={0.16}>
+          <p className="mt-9 max-w-xl text-[1.125rem] leading-relaxed text-bone/60">
+            We buy and sell scrap metal, vehicles, laptops and produce in bulk,
+            shipping out of Germany to buyers across the Gulf and South Asia.
+            Send a specification and we'll quote against it.
+          </p>
+        </Reveal>
+
+        <Reveal delay={0.24}>
+          <div className="mt-11 flex flex-wrap items-center gap-4">
+            <Link
+              to="/contact"
+              className="group inline-flex items-center gap-3 border border-gold bg-gold px-8 py-4 font-mono text-[0.75rem] uppercase tracking-[0.16em] text-ink transition-colors duration-300 hover:border-gold-lit hover:bg-gold-lit"
+            >
+              Request a quote
+              <ArrowUpRight
+                className="size-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                aria-hidden="true"
+              />
+            </Link>
+            <Link
+              to="/categories"
+              className="group inline-flex items-center gap-3 border border-bone/25 px-8 py-4 font-mono text-[0.75rem] uppercase tracking-[0.16em] text-bone transition-colors duration-300 hover:border-bone hover:bg-bone hover:text-ink"
+            >
+              See what we carry
+              <ArrowRight
+                className="size-4 transition-transform duration-300 group-hover:translate-x-1"
+                aria-hidden="true"
+              />
             </Link>
           </div>
+        </Reveal>
+      </div>
 
-          {/* Why Choose Us */}
-          <div className="why-choose-us-block">
-            <div className="why-choose-card">
-              <h2 className="card-title">WHY CHOOSE US</h2>
-              <p className="card-text">
-                A trusted and reliable partner in the world of international trade and bulk procurement.
-              </p>
-              <Link to="/contact" className="secondary-button">
-                CONTACT US
+      {/* Manifest strip — the whole book in one line, and a way in. */}
+      <Reveal delay={0.3} className="relative border-t border-ink-line/80 bg-ink/50 backdrop-blur-sm">
+        <ul className="mx-auto grid max-w-[84rem] grid-cols-2 sm:grid-cols-3 lg:grid-cols-5">
+          {BOOK.map((entry) => (
+            <li key={entry.slug} className="border-b border-r border-ink-line/80 last:border-r-0">
+              <Link
+                to={`/categories/${entry.slug}`}
+                className="group flex h-full flex-col justify-between gap-6 p-5 transition-colors duration-300 hover:bg-gold/10 lg:p-6"
+              >
+                <span className="font-mono text-[0.625rem] uppercase tracking-[0.2em] text-bone/35">
+                  {String(entry.lines).padStart(2, "0")}{" "}
+                  {entry.lines === 1 ? "line" : "lines"}
+                </span>
+                <span className="flex items-end justify-between gap-3">
+                  <span className="font-display text-xl font-bold uppercase text-bone transition-colors group-hover:text-gold">
+                    {entry.name}
+                  </span>
+                  <ArrowUpRight
+                    className="size-4 shrink-0 text-bone/30 transition-all duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-gold"
+                    aria-hidden="true"
+                  />
+                </span>
               </Link>
-            </div>
-            <div className="image-container">
-              <img src="/asuppal/wareabout.jpg" alt="Building scaffolding" />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Worldwide Services */}
-      <section className="worldwide-services">
-        <div className="container mx-auto px-4 py-12">
-          <h2 className="section-title text-center">Worldwide Services</h2>
-          <div className="services-features">
-            <div className="feature-item">Reliable Supplier & Purchaser</div>
-            <div className="feature-item">Timely Delivery</div>
-            <div className="feature-item">Custom Solutions</div>
-          </div>
-          <p className="services-text">We provide cost-effective solutions without compromising on quality</p>
-        </div>
-      </section>
-
-      {/* Services We Offer */}
-      <section className="services-section">
-        <div className="container mx-auto px-4 py-12">
-          <h2 className="section-title text-center">Services We Offer</h2>
-          <p className="services-intro">
-            At AS Uppal Trading GmbH, we offer a range of services designed to help businesses succeed in the global
-            marketplace.
-          </p>
-          <p className="services-intro">Our core services include:</p>
-
-          <div className="services-grid">
-            <div className="service-card">
-              <div className="service-icon">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <circle cx="9" cy="21" r="1"></circle>
-                  <circle cx="20" cy="21" r="1"></circle>
-                  <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
-                </svg>
-              </div>
-              <h3 className="service-title">Bulk Purchases</h3>
-              <p className="service-text">
-                We specialize in sourcing high-quality products in bulk from trusted suppliers globally, ensuring the
-                best prices for raw materials, consumer goods, and industrial products.
-              </p>
-            </div>
-
-            <div className="service-card">
-              <div className="service-icon">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <circle cx="12" cy="12" r="10"></circle>
-                  <line x1="2" y1="12" x2="22" y2="12"></line>
-                  <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
-                </svg>
-              </div>
-              <h3 className="service-title">Global Import & Export</h3>
-              <p className="service-text">
-                Our team leverages efficient import and export networks, streamlining processes to ensure timely,
-                hassle-free deliveries.
-              </p>
-            </div>
-
-            <div className="service-card">
-              <div className="service-icon">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                  <circle cx="12" cy="10" r="3"></circle>
-                </svg>
-              </div>
-              <h3 className="service-title">Wholesale Distribution</h3>
-              <p className="service-text">
-                We not only purchase products in bulk but also distribute them to retailers at competitive pricing to
-                ensure the best value for consumers.
-              </p>
-            </div>
-
-            <div className="service-card">
-              <div className="service-icon">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <circle cx="11" cy="11" r="8"></circle>
-                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                </svg>
-              </div>
-              <h3 className="service-title">Market Research & Sourcing</h3>
-              <p className="service-text">
-                We help businesses identify and source the right products, conducting thorough market research of top
-                quality.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Global Sale & Bulk Purchaser */}
-      <section className="global-sale">
-        <div className="container mx-auto px-4 py-8">
-          <h2 className="section-title text-center">Global Sale & Bulk Purchaser</h2>
-          <p className="text-center text-lg">Connecting Businesses with Quality Products, at Unbeatable Prices</p>
-        </div>
-      </section>
-
-      {/* Why Choose Us Circle */}
-      <section className="why-choose-circle">
-        <div className="container mx-auto px-4 py-12">
-          <div className="circle-container">
-            <h2 className="circle-title">Why Choose US</h2>
-            <div className="circle-features">
-              <div className="circle-feature">Bulk Supplier & Purchasing Power</div>
-              <div className="circle-feature">Reliable & Timely Delivery</div>
-              <div className="circle-feature">Custom Solutions</div>
-            </div>
-            <Link to="/contact" className="circle-button">
-            Reach Us Out
-              </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Our Team */}
-      <section className="team-section">
-        <div className="container mx-auto px-4 py-12">
-          <h2 className="section-title text-center">Our Team</h2>
-
-          <div className="team-grid">
-            <div className="team-card">
-              <div className="team-image">
-                <img src="/asuppal/essa.jpg" alt="Muhammad Essa" />
-              </div>
-              <h3 className="team-name">MUHAMMAD ESSA</h3>
-              <p className="team-position">Chairman</p>
-              <div className="team-contact">
-                <a href="mailto:muhammadessa1992@gmail.com" className="team-email">
-                  muhammadessa1992@gmail.com
-                </a>
-              </div>
-            </div>
-
-            <div className="team-card">
-              <div className="team-image">
-                <img src="/asuppal/shahbaz.jpg" alt="Shahbaz Ahmad" />
-              </div>
-              <h3 className="team-name">SHAHBAZ AHMAD</h3>
-              <p className="team-position">Project Manager</p>
-              <div className="team-contact">
-                <a href="mailto:info@asuppal.com" className="team-email">
-                  info@asuppal.com
-                </a>
-              </div>
-            </div>
-
-            <div className="team-card">
-              <div className="team-image">
-                <img src="/asuppal/sohaib.jpg" alt="Sohaib Uppal" />
-              </div>
-              <h3 className="team-name">SOHAIB UPPAL</h3>
-              <p className="team-position">CEO</p>
-              <div className="team-contact">
-                <a href="mailto:sohaibuppal65@gmail.com" className="team-email">
-                  sohaibuppal65@gmail.com
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Our Mission */}
-      <section className="mission-section">
-        <div className="container mx-auto px-4 py-12">
-          <div className="mission-grid">
-            <div className="mission-content">
-              <h2 className="section-title">Our Mission</h2>
-              <h3 className="mission-subtitle">Empowering Businesses with Reliable Bulk Solutions Worldwide.</h3>
-              <p className="mission-text">
-              At AS Uppal Trading GmbH, our mission is to provide businesses with reliable access to high-quality products in bulk, sourced from trusted suppliers worldwide. We are dedicated to driving global trade by ensuring competitive pricing, timely delivery, and unmatched service. Our goal is to be the go-to partner for businesses seeking to scale, offering tailored solutions that meet every procurement need efficiently and effectively.
-              </p>
-            </div>
-            <div className="mission-images">
-              <div className="mission-image">
-                <img src="/asuppal/usedcar.jpg" alt="Mission image 1" />
-              </div>
-              <div className="mission-image">
-                <img src="/asuppal/alumland.jpg" alt="Mission image 2" />
-              </div>
-              <div className="mission-image">
-                <img src="/asuppal/walnut.jpg" alt="Mission image 2" />
-              </div>
-              <div className="mission-image">
-                <img src="/asuppal/oilland.jpg" alt="Mission image 2" />
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Our Progress */}
-      <section className="progress-section">
-        <div className="container mx-auto px-4 py-12">
-          <h2 className="section-title text-center">Our Progress</h2>
-          <p className="progress-subtitle text-center">Make a difference in the life of an individual...</p>
-
-          <div className="progress-grid">
-            <div className="progress-card">
-              <div className="progress-image">
-                <img src="/asuppal/motorscrap.jpg" alt="Motor Scrap" />
-              </div>
-              <h3 className="progress-title">Motor Scrap</h3>
-              <p className="progress-text">High-quality motor scrap sourced for recycling and manufacturing in bulk.</p>
-            </div>
-
-            <div className="progress-card">
-              <div className="progress-image">
-                <img src="/asuppal/walnut.jpg" alt="WalNuts" />
-              </div>
-              <h3 className="progress-title">WalNuts</h3>
-              <p className="progress-text">Reliable and high-quality bulk purchase of walnuts.</p>
-            </div>
-
-            <div className="progress-card">
-              <div className="progress-image">
-                <img src="/asuppal/usedlap.jpg" alt="Laptop" />
-              </div>
-              <h3 className="progress-title">Laptop</h3>
-              <p className="progress-text">Sourcing bulk laptops at the efficient recycling and component recovery.</p>
-            </div>
-          </div>
-
-          <div className="text-center mt-8">
-          <Link to="/about" className="know-more-btn">
-          Know More!
-              </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Newsletter */}
-      <section className="newsletter-section">
-        <div className="container mx-auto px-4 py-6">
-          <div className="newsletter-container">
-            <div className="newsletter-text">
-              <h3 className="newsletter-title">Newsletter: Stay tuned for Updates</h3>
-            </div>
-            <div className="newsletter-form">
-              <input type="email" placeholder="Email address" className="newsletter-input" />
-              <button className="newsletter-button">→</button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonials */}
-      <section className="testimonials-section">
-        <div className="container mx-auto px-4 py-12">
-          <h2 className="section-title text-center">Thus Spoke our Customers</h2>
-          <p className="testimonials-subtitle text-center">Client Testimonials</p>
-
-          <div className="testimonial-container">
-            <div className="testimonial">
-              <p className="testimonial-text">
-                "Working with ASUppalTradingGmbH has been a game-changer for our business. Their bulk procurement
-                service is reliable, and their pricing is competitive. We continue to order our operations smoothly with
-                their support."
-              </p>
-              <div className="testimonial-author">
-                <p className="author-name">John D.</p>
-                <p className="author-company">CEO, XYZ Industries Ltd</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* WhatsApp Button */}
-      <a
-        href="https://wa.me/491629775400"
-        className="whatsapp-button"
-        target="_blank"
-        rel="noopener noreferrer"
-        aria-label="Chat on WhatsApp"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
-        </svg>
-      </a>
-
-
-    {/* Footer */}
-    <Footer />
-  </div>
-  )
+            </li>
+          ))}
+        </ul>
+      </Reveal>
+    </section>
+  );
 }
 
-export default Home
+/* ── The book ─────────────────────────────────────────────────── */
+
+function TheBook() {
+  return (
+    <section className="bg-bone">
+      <div className="mx-auto max-w-[84rem] px-6 py-20 lg:px-10 lg:py-28">
+        <Reveal className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <SpecLabel tone="light">The book · 15 lines</SpecLabel>
+            <h2 className="mt-6 font-display text-[clamp(2rem,5vw,3.5rem)] font-bold uppercase leading-[0.95] tracking-[-0.015em]">
+              What we trade
+            </h2>
+          </div>
+          <Link
+            to="/categories"
+            className="group inline-flex shrink-0 items-center gap-2.5 font-mono text-[0.75rem] uppercase tracking-[0.16em] text-ink"
+          >
+            <span className="border-b border-ink/25 pb-1 transition-colors group-hover:border-gold group-hover:text-gold-deep">
+              Full catalogue
+            </span>
+            <ArrowUpRight className="size-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" aria-hidden="true" />
+          </Link>
+        </Reveal>
+
+        {/* Read as a ledger: class, what sits under it, depth, units. */}
+        <RevealGroup as="ul" className="mt-12 border-t border-bone-line">
+          {BOOK.map((entry) => (
+            <RevealItem as="li" key={entry.slug} className="border-b border-bone-line">
+              <Link
+                to={`/categories/${entry.slug}`}
+                className="group grid grid-cols-1 items-center gap-3 py-6 transition-colors duration-300 sm:grid-cols-[minmax(0,1fr)_auto] md:grid-cols-[14rem_minmax(0,1fr)_7rem_auto] md:gap-8"
+              >
+                <span className="font-display text-[1.75rem] font-bold uppercase leading-none tracking-[-0.01em] transition-colors duration-300 group-hover:text-gold-deep">
+                  {entry.name}
+                </span>
+                <span className="font-mono text-[0.8125rem] tracking-[0.04em] text-slate">
+                  {entry.detail}
+                </span>
+                <span className="font-mono text-[0.6875rem] uppercase tracking-[0.16em] text-gold-deep md:text-right">
+                  {entry.listings} units
+                </span>
+                <span
+                  aria-hidden="true"
+                  className="hidden size-9 place-items-center border border-bone-line transition-colors duration-300 group-hover:border-gold group-hover:bg-gold md:grid"
+                >
+                  <ArrowUpRight className="size-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                </span>
+              </Link>
+            </RevealItem>
+          ))}
+        </RevealGroup>
+      </div>
+    </section>
+  );
+}
+
+/* ── Capabilities ─────────────────────────────────────────────── */
+
+function Capabilities() {
+  return (
+    <section className="border-y border-ink-line bg-ink">
+      <div className="mx-auto max-w-[84rem] px-6 py-20 lg:px-10 lg:py-28">
+        <Reveal className="max-w-2xl">
+          <SpecLabel>What we do</SpecLabel>
+          <h2 className="mt-6 font-display text-[clamp(2rem,5vw,3.5rem)] font-bold uppercase leading-[0.95] tracking-[-0.015em] text-bone">
+            Four things, done properly
+          </h2>
+          <p className="mt-6 text-[1.0625rem] leading-relaxed text-bone/55">
+            We are a supplier and a buyer on the same desk. That means one point of
+            contact from the first enquiry to the loaded container.
+          </p>
+        </Reveal>
+
+        <RevealGroup className="mt-14 grid gap-px border border-ink-line bg-ink-line sm:grid-cols-2">
+          {SERVICES.map(({ icon: Icon, title, body }) => (
+            <RevealItem key={title} className="group bg-ink p-8 transition-colors duration-500 hover:bg-ink-raised lg:p-10">
+              <span className="grid size-12 place-items-center border border-gold/30 text-gold transition-colors duration-300 group-hover:border-gold group-hover:bg-gold group-hover:text-ink">
+                <Icon className="size-5" aria-hidden="true" />
+              </span>
+              <h3 className="mt-7 font-display text-xl font-bold uppercase tracking-[-0.005em] text-bone">
+                {title}
+              </h3>
+              <p className="mt-3.5 max-w-md text-[0.9375rem] leading-relaxed text-bone/50">
+                {body}
+              </p>
+            </RevealItem>
+          ))}
+        </RevealGroup>
+      </div>
+    </section>
+  );
+}
+
+/* ── Mission ──────────────────────────────────────────────────── */
+
+function Mission() {
+  return (
+    <section className="bg-bone">
+      <div className="mx-auto grid max-w-[84rem] gap-14 px-6 py-20 lg:grid-cols-2 lg:gap-20 lg:px-10 lg:py-28">
+        <Reveal from="left">
+          <SpecLabel tone="light">Our mission</SpecLabel>
+          <h2 className="mt-6 font-display text-[clamp(1.9rem,4.4vw,3rem)] font-bold uppercase leading-[0.98] tracking-[-0.015em]">
+            Reliable bulk supply,
+            <span className="block text-gold-deep">without the runaround.</span>
+          </h2>
+          <p className="mt-7 text-[1.0625rem] leading-relaxed text-slate">
+            A.S. Uppal Trading GmbH gives businesses dependable access to
+            high-quality goods in bulk, sourced from suppliers we have actually
+            worked with. We compete on price, on loading times and on answering
+            the phone — not on promises.
+          </p>
+          <p className="mt-5 text-[1.0625rem] leading-relaxed text-slate">
+            Our aim is to be the partner you call when a shipment has to be right
+            the first time.
+          </p>
+          <Link
+            to="/about"
+            className="group mt-9 inline-flex items-center gap-3 border border-ink px-7 py-3.5 font-mono text-[0.75rem] uppercase tracking-[0.16em] text-ink transition-colors duration-300 hover:bg-ink hover:text-bone"
+          >
+            More about the firm
+            <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" aria-hidden="true" />
+          </Link>
+        </Reveal>
+
+        {/* lg:pb-8 reserves the room the staggered column drops into. */}
+        <Reveal from="right" className="grid grid-cols-2 gap-4 self-start lg:pb-8">
+          {MISSION_IMAGES.map((img, i) => (
+            <div
+              key={img.src}
+              className={cn(
+                "overflow-hidden bg-ink",
+                // Offset the second column so the block reads as a stack rather
+                // than a grid. Only from lg up: at narrow widths the two images
+                // sit side by side in one glance and the drop just looks broken.
+                i % 2 === 1 && "lg:translate-y-8"
+              )}
+            >
+              <img
+                src={img.src}
+                alt={img.alt}
+                loading="lazy"
+                className="aspect-[4/5] size-full object-cover transition-transform duration-[900ms] ease-[cubic-bezier(0.16,1,0.3,1)] hover:scale-105"
+              />
+            </div>
+          ))}
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
+/* ── Featured lines ───────────────────────────────────────────── */
+
+function Featured() {
+  return (
+    <section className="border-t border-bone-line bg-bone-dim/50">
+      <div className="mx-auto max-w-[84rem] px-6 py-20 lg:px-10 lg:py-28">
+        <Reveal className="max-w-2xl">
+          <SpecLabel tone="light">Moving now</SpecLabel>
+          <h2 className="mt-6 font-display text-[clamp(2rem,5vw,3.5rem)] font-bold uppercase leading-[0.95] tracking-[-0.015em]">
+            Lines on the move
+          </h2>
+        </Reveal>
+
+        <RevealGroup className="mt-14 grid gap-6 md:grid-cols-3">
+          {FEATURED.map((item) => (
+            <RevealItem as="article" key={item.name} className="h-full">
+              <Link
+                to={item.to}
+                className="group flex h-full flex-col border border-bone-line bg-white transition-colors duration-500 hover:border-gold"
+              >
+                <div className="relative aspect-[4/3] overflow-hidden bg-ink">
+                  <img
+                    src={item.image}
+                    alt=""
+                    loading="lazy"
+                    className="size-full object-cover transition-transform duration-[900ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.06]"
+                  />
+                </div>
+                <div className="flex flex-1 flex-col p-6">
+                  <h3 className="font-display text-xl font-bold uppercase tracking-[-0.005em]">
+                    {item.name}
+                  </h3>
+                  <p className="mt-3 text-[0.9375rem] leading-relaxed text-slate">
+                    {item.body}
+                  </p>
+                  <span className="mt-auto flex items-center gap-2 pt-6 font-mono text-[0.6875rem] uppercase tracking-[0.18em] text-gold-deep">
+                    View line
+                    <ArrowUpRight className="size-3.5 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" aria-hidden="true" />
+                  </span>
+                </div>
+              </Link>
+            </RevealItem>
+          ))}
+        </RevealGroup>
+      </div>
+    </section>
+  );
+}
+
+/* ── Team ─────────────────────────────────────────────────────── */
+
+function Team() {
+  return (
+    <section className="bg-bone">
+      <div className="mx-auto max-w-[84rem] px-6 py-20 lg:px-10 lg:py-28">
+        <Reveal className="max-w-2xl">
+          <SpecLabel tone="light">Who you deal with</SpecLabel>
+          <h2 className="mt-6 font-display text-[clamp(2rem,5vw,3.5rem)] font-bold uppercase leading-[0.95] tracking-[-0.015em]">
+            The desk
+          </h2>
+          <p className="mt-6 text-[1.0625rem] leading-relaxed text-slate">
+            Three people run the book. You'll be speaking to one of them, not a
+            call centre.
+          </p>
+        </Reveal>
+
+        <RevealGroup className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {TEAM.map((person) => (
+            <RevealItem
+              as="article"
+              key={person.name}
+              className="group relative flex h-full flex-col overflow-hidden border border-ink-line bg-ink p-8"
+            >
+              {/* Initials set oversized and low-contrast, so the card has a
+                  face without pretending to have a photograph. */}
+              <span
+                aria-hidden="true"
+                className="pointer-events-none absolute -right-3 -top-7 select-none font-display text-[7.5rem] font-bold leading-none text-bone/[0.045] transition-colors duration-500 group-hover:text-gold/10"
+              >
+                {person.initials}
+              </span>
+
+              <span className="grid size-12 place-items-center border border-gold/40 font-display text-sm font-bold text-gold transition-colors duration-300 group-hover:bg-gold group-hover:text-ink">
+                {person.initials}
+              </span>
+
+              <h3 className="mt-7 font-display text-xl font-bold uppercase tracking-[-0.005em] text-bone">
+                {person.name}
+              </h3>
+              <p className="mt-2 font-mono text-[0.6875rem] uppercase tracking-[0.18em] text-gold">
+                {person.role}
+              </p>
+
+              <div className="mt-auto space-y-2.5 pt-8">
+                <a
+                  href={`mailto:${person.email}`}
+                  className="flex items-center gap-2.5 break-all text-[0.875rem] text-bone/55 transition-colors hover:text-gold"
+                >
+                  <Mail className="size-4 shrink-0 text-gold" aria-hidden="true" />
+                  {person.email}
+                </a>
+                {person.tel && (
+                  <a
+                    href={`tel:${person.tel.replace(/\s/g, "")}`}
+                    className="flex items-center gap-2.5 font-mono text-[0.8125rem] tracking-[0.06em] text-bone/55 transition-colors hover:text-gold"
+                  >
+                    <Phone className="size-4 shrink-0 text-gold" aria-hidden="true" />
+                    {person.tel}
+                  </a>
+                )}
+              </div>
+            </RevealItem>
+          ))}
+        </RevealGroup>
+      </div>
+    </section>
+  );
+}
+
+/* ── Testimonial ──────────────────────────────────────────────── */
+
+function Testimonial() {
+  return (
+    <section className="border-y border-ink-line bg-ink">
+      <div className="mx-auto max-w-[84rem] px-6 py-20 lg:px-10 lg:py-24">
+        <Reveal>
+          <Testimonials items={TESTIMONIALS} />
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
+/* ── Newsletter ───────────────────────────────────────────────── */
+
+function Newsletter() {
+  const [email, setEmail] = useState("");
+
+  /**
+   * There's no mailing-list backend, so the form opens a pre-addressed
+   * message rather than pretending to subscribe anyone.
+   */
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const subject = encodeURIComponent("Add me to the trade list");
+    const body = encodeURIComponent(`Please add ${email} to your trade updates.`);
+    window.location.href = `mailto:${CONTACT.email}?subject=${subject}&body=${body}`;
+  };
+
+  return (
+    <section className="bg-bone">
+      <div className="mx-auto max-w-[84rem] px-6 py-16 lg:px-10 lg:py-20">
+        <Reveal className="flex flex-col gap-8 border border-bone-line bg-white p-8 lg:flex-row lg:items-center lg:justify-between lg:p-12">
+          <div className="max-w-lg">
+            <SpecLabel tone="light">Trade list</SpecLabel>
+            <h2 className="mt-5 font-display text-[clamp(1.5rem,3vw,2rem)] font-bold uppercase leading-tight tracking-[-0.01em]">
+              Get new lines as they land
+            </h2>
+            <p className="mt-3 text-[0.9375rem] leading-relaxed text-slate">
+              Occasional notes on what we've bought and what's available. No more
+              than one a month.
+            </p>
+          </div>
+
+          <form onSubmit={handleSubmit} className="flex w-full max-w-md gap-0">
+            <label htmlFor="trade-list-email" className="sr-only">
+              Email address
+            </label>
+            <input
+              id="trade-list-email"
+              type="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="you@company.com"
+              className="min-w-0 flex-1 border border-bone-line bg-bone px-5 py-4 font-mono text-[0.8125rem] text-ink placeholder:text-slate/60 focus:border-gold focus:outline-none"
+            />
+            <button
+              type="submit"
+              className="group shrink-0 border border-ink bg-ink px-6 py-4 text-bone transition-colors duration-300 hover:border-gold hover:bg-gold hover:text-ink"
+            >
+              <span className="sr-only">Join the trade list</span>
+              <ArrowRight className="size-5 transition-transform duration-300 group-hover:translate-x-1" aria-hidden="true" />
+            </button>
+          </form>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
+/* ── WhatsApp ─────────────────────────────────────────────────── */
+
+function WhatsAppButton() {
+  return (
+    <a
+      href={CONTACT.whatsapp}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label="Chat with us on WhatsApp"
+      className="group fixed bottom-6 right-6 z-40 grid size-14 place-items-center rounded-full bg-[#25D366] text-white shadow-lg shadow-ink/25 transition-transform duration-300 hover:scale-105"
+    >
+      <svg viewBox="0 0 24 24" fill="currentColor" className="size-7" aria-hidden="true">
+        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+      </svg>
+    </a>
+  );
+}
+
+/* ── Page ─────────────────────────────────────────────────────── */
+
+export default function Home() {
+  return (
+    <>
+      <Hero />
+      <Marquee items={COMMODITIES} />
+      <TheBook />
+      <Capabilities />
+      <Mission />
+      <Featured />
+      <Team />
+      <Testimonial />
+      <Newsletter />
+      <WhatsAppButton />
+    </>
+  );
+}
