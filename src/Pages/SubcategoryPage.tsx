@@ -2,7 +2,7 @@ import React from "react"
 
 
 import { useState, useEffect } from "react"
-import { Link, useParams } from "react-router-dom"
+import { Link, useParams } from "react-router"
 import Header from "../Components/Header.tsx"
 import Footer from "../Components/Footer.tsx"
 

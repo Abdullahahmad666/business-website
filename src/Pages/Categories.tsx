@@ -1,5 +1,5 @@
 import React from "react"
-import { Link } from "react-router-dom"
+import { Link } from "react-router"
 import Header from "../Components/Header.tsx"
 import Footer from "../Components/Footer.tsx"
 
