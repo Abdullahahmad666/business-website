@@ -1,13 +1,120 @@
+/*  Cascade order. `brand` holds the base element styling below, so Tailwind's
+    utilities in the last layer always win over it without needing !important. */
+@layer theme, base, brand, components, utilities;
+
 @import "tailwindcss";
 
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans",
-    "Droid Sans", "Helvetica Neue", sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+@theme {
+  /* ── Palette ──────────────────────────────────────────────────
+     A.S. Uppal trades metal, machinery and produce. The scheme is
+     the yard at night: oxidised black, struck gold, one ember. */
+  --color-ink: #0a0a0b;
+  --color-ink-raised: #141417;
+  --color-ink-line: #26262c;
+
+  --color-gold: #d4af37;
+  --color-gold-lit: #f0c75e;
+  --color-gold-deep: #8a6f1e;
+  --color-ember: #f59e0b;
+
+  --color-bone: #f6f4ef;
+  --color-bone-dim: #e8e4da;
+  --color-bone-line: #d8d3c6;
+  --color-slate: #6f6f78;
+
+  /* ── Type ─────────────────────────────────────────────────────
+     Display is Archivo on its width axis, pushed to 125% (Expanded).
+     Set uppercase it reads like lettering stencilled on a container
+     flank — industrial, wide, load-bearing. Plex Mono carries every
+     number: tonnage, grades, HS codes, reference lines. */
+  --font-display: "Archivo Variable", "Archivo", system-ui, sans-serif;
+  --font-sans: "IBM Plex Sans Variable", "IBM Plex Sans", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", monospace;
+
+  /* ── Motion ───────────────────────────────────────────────── */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
+@layer brand {
+  html {
+    scroll-behavior: smooth;
+    /* Header is fixed; anchor jumps must clear it. */
+    scroll-padding-top: 6.5rem;
+  }
+
+  body {
+    margin: 0;
+    background-color: var(--color-bone);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* The display face only earns its keep wide and uppercase. */
+  .font-display {
+    font-family: var(--font-display);
+    font-stretch: 125%;
+    font-variation-settings: "wdth" 125;
+  }
+
+  /* Tabular figures everywhere numbers are compared down a column. */
+  .font-mono {
+    font-variant-numeric: tabular-nums;
+  }
+
+  ::selection {
+    background-color: var(--color-gold);
+    color: var(--color-ink);
+  }
+
+  /* Commodity marquee. The track holds the list twice, so translating by
+     exactly -50% lands on an identical frame and the loop is seamless. */
+  @keyframes marquee-track {
+    from {
+      transform: translate3d(0, 0, 0);
+    }
+    to {
+      transform: translate3d(-50%, 0, 0);
+    }
+  }
+
+  .marquee-track {
+    animation: marquee-track 42s linear infinite;
+    will-change: transform;
+  }
+
+  .marquee:hover .marquee-track {
+    animation-play-state: paused;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .marquee-track {
+      animation: none;
+      transform: none;
+    }
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-gold);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
 }
