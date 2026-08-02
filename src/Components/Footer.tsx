@@ -1,85 +1,201 @@
-import React from 'react';
-import { NavLink } from "react-router"
+import React from "react";
+import { Link, NavLink } from "react-router";
+import { ArrowUp, ArrowUpRight, Mail, MapPin, Phone } from "lucide-react";
+import { Reveal } from "./ui/Reveal.tsx";
+import { SpecLabel } from "./ui/Manifest.tsx";
+import { BOOK, CONTACT } from "../data/company.ts";
+import { cn } from "../lib/utils.ts";
 
-function Footer() {
+
+const NAV = [
+  { to: "/", label: "Home", end: true },
+  { to: "/about", label: "About Us" },
+  { to: "/categories", label: "Categories" },
+  { to: "/contact", label: "Contact" },
+];
+
+
+function ColumnHeading({ children }: { children: React.ReactNode }) {
   return (
-    <>
-    
-    <footer className="footer">
-      <div className="container">
-        <div className="footer-grid">
-          {/* Left Column */}
-          <div>
-            <h3 className="footer-heading">ASUppalTradingGmbH</h3>
-            <nav className="footer-nav">
-            <NavLink to="/" className={({ isActive }) => isActive ? "footer-link active-link" : "footer-link"}>Home</NavLink>
-              <NavLink to="/about" className={({ isActive }) => isActive ? "footer-link active-link" : "footer-link"}>About Us</NavLink>
-<NavLink to="/categories" className={({ isActive }) => isActive ? "footer-link active-link" : "footer-link"}>Categories</NavLink>
-<NavLink to="/contact" className={({ isActive }) => isActive ? "footer-link active-link" : "footer-link"}>Contact</NavLink>
+    <h3 className="mb-6 font-mono text-[0.6875rem] uppercase tracking-[0.22em] text-gold">
+      {children}
+    </h3>
+  );
+}
 
-            </nav>
-          </div>
+const linkBase =
+  "group inline-flex items-center gap-2 text-[0.9375rem] text-bone/60 transition-colors duration-300 hover:text-bone";
 
-          {/* Right Column */}
-          <div>
-            <h3 className="footer-heading">Contact us</h3>
-            <div className="contact-info">
-              <p>Germany Obere Zahlbachere str 56 Mainz 55131</p>
-              <p className="contact-item">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="contact-icon"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
-                  />
-                </svg>
-                +49 162 9775400
+export default function Footer() {
+  const year = new Date().getFullYear();
+
+  return (
+    <footer className="relative overflow-hidden bg-ink text-bone">
+      {/* ── Closing call to action ───────────────────────────────── */}
+      <div className="border-b border-ink-line">
+        <div className="mx-auto max-w-[84rem] px-6 py-16 lg:px-10 lg:py-20">
+          <Reveal className="flex flex-col gap-10 lg:flex-row lg:items-end lg:justify-between">
+            <div className="max-w-2xl">
+              <SpecLabel>Enquiries · Mainz, DE</SpecLabel>
+              <p className="mt-6 font-display text-[clamp(1.75rem,4vw,3rem)] font-bold uppercase leading-[0.98] tracking-[-0.01em]">
+                Send us a specification.
+                <span className="block text-gold">We'll quote it.</span>
               </p>
-              <p className="contact-item">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="contact-icon"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                  />
-                </svg>
-                <a href="mailto:info@asuppaltradinggmbh.com" className="footer-link">
-                info@asuppaltradinggmbh.com
-                </a>
+              <p className="mt-5 text-[1.0625rem] leading-relaxed text-bone/55">
+                Tell us the grade, the volume and the destination port. You'll get a
+                price and a loading window back — not a brochure.
               </p>
             </div>
+
+            <Link
+              to="/contact"
+              className={cn(
+                "group inline-flex shrink-0 items-center gap-3 border border-gold bg-gold px-8 py-4",
+                "font-mono text-[0.75rem] uppercase tracking-[0.16em] text-ink",
+                "transition-colors duration-300 hover:border-gold-lit hover:bg-gold-lit"
+              )}
+            >
+              Request a quote
+              <ArrowUpRight
+                className="size-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                aria-hidden="true"
+              />
+            </Link>
+          </Reveal>
+        </div>
+      </div>
+
+      {/* ── Colophon ─────────────────────────────────────────────── */}
+      <div className="mx-auto max-w-[84rem] px-6 py-16 lg:px-10">
+        <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1.2fr] lg:gap-10">
+          {/* Identity */}
+          <div>
+            <div className="flex items-center gap-3.5">
+              <span className="grid size-11 shrink-0 place-items-center border border-gold/50 font-display text-sm font-bold text-gold">
+                AS
+              </span>
+              <span className="flex flex-col leading-none">
+                <span className="font-display text-[1.0625rem] font-bold uppercase">
+                  A.S. Uppal
+                </span>
+                <span className="mt-1 font-mono text-[0.5625rem] uppercase tracking-[0.3em] text-gold">
+                  Trading GmbH
+                </span>
+              </span>
+            </div>
+            <p className="mt-6 max-w-xs text-[0.9375rem] leading-relaxed text-bone/55">
+              A Mainz-based trading house moving scrap metal, vehicles, laptops and
+              produce between Europe, the Gulf and South Asia.
+            </p>
+          </div>
+
+          {/* Navigate */}
+          <nav aria-label="Footer">
+            <ColumnHeading>Navigate</ColumnHeading>
+            <ul className="space-y-3.5">
+              {NAV.map((item) => (
+                <li key={item.to}>
+                  <NavLink
+                    to={item.to}
+                    end={item.end}
+                    className={({ isActive }) =>
+                      cn(linkBase, isActive && "text-gold hover:text-gold")
+                    }
+                  >
+                    <span
+                      aria-hidden="true"
+                      className="h-px w-0 bg-gold transition-all duration-300 group-hover:w-4"
+                    />
+                    {item.label}
+                  </NavLink>
+                </li>
+              ))}
+            </ul>
+          </nav>
+
+          {/* Catalogue */}
+          <div>
+            <ColumnHeading>What we trade</ColumnHeading>
+            <ul className="space-y-3.5">
+              {BOOK.map((item) => (
+                <li key={item.slug}>
+                  <Link to={`/categories/${item.slug}`} className={cn(linkBase, "justify-between w-full")}>
+                    <span className="flex items-center gap-2">
+                      <span
+                        aria-hidden="true"
+                        className="h-px w-0 bg-gold transition-all duration-300 group-hover:w-4"
+                      />
+                      {item.name}
+                    </span>
+                    <span className="font-mono text-[0.6875rem] text-bone/30">
+                      {String(item.lines).padStart(2, "0")}
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Reach */}
+          <div>
+            <ColumnHeading>Reach us</ColumnHeading>
+            <address className="space-y-4 not-italic">
+              <a
+                href={`tel:${CONTACT.tel.replace(/\s/g, "")}`}
+                className="flex items-center gap-3 font-mono text-[0.875rem] tracking-[0.06em] text-bone/70 transition-colors hover:text-gold"
+              >
+                <Phone className="size-4 shrink-0 text-gold" aria-hidden="true" />
+                {CONTACT.tel}
+              </a>
+              <a
+                href={`mailto:${CONTACT.email}`}
+                className="flex items-start gap-3 break-all text-[0.9375rem] text-bone/70 transition-colors hover:text-gold"
+              >
+                <Mail className="mt-1 size-4 shrink-0 text-gold" aria-hidden="true" />
+                {CONTACT.email}
+              </a>
+              <p className="flex items-start gap-3 text-[0.9375rem] leading-relaxed text-bone/55">
+                <MapPin className="mt-1 size-4 shrink-0 text-gold" aria-hidden="true" />
+                <span>
+                  Obere Zahlbacher Str. 56
+                  <br />
+                  55131 Mainz, Germany
+                </span>
+              </p>
+            </address>
           </div>
         </div>
       </div>
 
-      {/* Back to top button */}
+      {/* ── Legal ────────────────────────────────────────────────── */}
+      <div className="border-t border-ink-line">
+        <div className="mx-auto flex max-w-[84rem] flex-col-reverse items-start gap-4 px-6 py-7 font-mono text-[0.6875rem] uppercase tracking-[0.14em] text-bone/35 sm:flex-row sm:items-center sm:justify-between lg:px-10">
+          <p>© {year} A.S. Uppal Trading GmbH</p>
+          <p>Registered in Mainz · Rheinland-Pfalz · Germany</p>
+        </div>
+      </div>
+
+      {/* ── Signature: the company name stencilled across the base,
+             cropped by the viewport the way it would be on a container
+             flank. Purely typographic, no image weight. ───────────── */}
+      <div aria-hidden="true" className="pointer-events-none select-none px-6 pb-2 lg:px-10">
+        <p className="font-display text-[16vw] font-bold uppercase leading-[0.78] tracking-[-0.02em] text-bone/[0.035]">
+          Uppal Trading
+        </p>
+      </div>
+
       <button
+        type="button"
         onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-        className="back-to-top"
+        className={cn(
+          "fixed bottom-6 left-6 z-40 grid size-11 place-items-center",
+          "border border-gold/40 bg-ink/85 text-gold backdrop-blur",
+          "transition-colors duration-300 hover:border-gold hover:bg-gold hover:text-ink"
+        )}
         aria-label="Back to top"
       >
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
-        </svg>
+        <ArrowUp className="size-4" aria-hidden="true" />
       </button>
     </footer>
-  
-    </>
   );
 }
-
-export default Footer;
