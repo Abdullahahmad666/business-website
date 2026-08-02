@@ -1,13 +1,22 @@
 // ProductDetailPage.tsx
-import React from "react"
+import React, { useState } from "react";
+import { Link, useParams } from "react-router";
+import { ArrowUpRight, ChevronLeft, ChevronRight, MessageCircle, PackageX } from "lucide-react";
+import { Reveal } from "../Components/ui/Reveal.tsx";
+import { SpecLabel } from "../Components/ui/Manifest.tsx";
+import { CONTACT } from "../data/company.ts";
+import { cn } from "../lib/utils.ts";
 
-import { useState, useEffect } from "react"
-import { Link, useParams } from "react-router"
-import Header from "../Components/Header.tsx"
-import Footer from "../Components/Footer.tsx"
+type Product = {
+  id: number;
+  name: string;
+  price: string;
+  description: string;
+  specifications: Record<string, string>;
+  images: string[];
+};
 
-// Sample product data
-const productsData = {
+const PRODUCTS: Record<string, Product[]> = {
   "used-cars": [
     {
       id: 1,
@@ -376,276 +385,220 @@ const productsData = {
   ],
 }
 
-function ProductDetailPage() {
-  const { subcategory } = useParams<{ subcategory: string }>()
-  const [activeImage, setActiveImage] = useState(0)
-  const [product, setProduct] = useState<any>(null)
+/** Main plate plus thumbnails. Handles single-image lines gracefully. */
+function ProductGallery({ images, name }: { images: string[]; name: string }) {
+  const shots = images.filter(Boolean);
+  const [index, setIndex] = useState(0);
+  const go = (step: number) => setIndex((i) => (i + step + shots.length) % shots.length);
 
-  useEffect(() => {
-    // In a real app, you would fetch this data from an API
-    if (subcategory && productsData[subcategory as keyof typeof productsData]) {
-      // Just get the first product for demo purposes
-      setProduct(productsData[subcategory as keyof typeof productsData][0])
-    }
-  }, [subcategory])
+  return (
+    <div>
+      <div className="relative aspect-[4/3] overflow-hidden border border-bone-line bg-ink">
+        {shots.map((src, i) => (
+          <img
+            key={src}
+            src={src}
+            alt={i === index ? name : ""}
+            aria-hidden={i !== index}
+            loading={i === 0 ? "eager" : "lazy"}
+            className={cn(
+              "absolute inset-0 size-full object-cover transition-opacity duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]",
+              i === index ? "opacity-100" : "opacity-0"
+            )}
+          />
+        ))}
+
+        {shots.length > 1 && (
+          <>
+            <button
+              type="button"
+              onClick={() => go(-1)}
+              aria-label="Previous image"
+              className="absolute left-4 top-1/2 grid size-10 -translate-y-1/2 place-items-center border border-bone/25 bg-ink/70 text-bone backdrop-blur transition-colors hover:border-gold hover:bg-gold hover:text-ink"
+            >
+              <ChevronLeft className="size-4" aria-hidden="true" />
+            </button>
+            <button
+              type="button"
+              onClick={() => go(1)}
+              aria-label="Next image"
+              className="absolute right-4 top-1/2 grid size-10 -translate-y-1/2 place-items-center border border-bone/25 bg-ink/70 text-bone backdrop-blur transition-colors hover:border-gold hover:bg-gold hover:text-ink"
+            >
+              <ChevronRight className="size-4" aria-hidden="true" />
+            </button>
+          </>
+        )}
+      </div>
+
+      {shots.length > 1 && (
+        <div className="mt-4 flex gap-3">
+          {shots.map((src, i) => (
+            <button
+              key={src}
+              type="button"
+              onClick={() => setIndex(i)}
+              aria-label={`Show image ${i + 1}`}
+              aria-current={i === index}
+              className={cn(
+                "relative size-20 shrink-0 overflow-hidden border transition-colors duration-300",
+                i === index ? "border-gold" : "border-bone-line hover:border-ink/40"
+              )}
+            >
+              <img src={src} alt="" loading="lazy" className="size-full object-cover" />
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default function ProductDetailPage() {
+  const { subcategory } = useParams<{ subcategory: string }>();
+  // Local, synchronous data - read during render rather than via an effect,
+  // which previously flashed the not-found state on every load.
+  const product = subcategory ? PRODUCTS[subcategory]?.[0] : undefined;
 
   if (!product) {
     return (
-      <div className="flex flex-col min-h-screen">
-         <div className="top-bar">
-      <div className="top-bar-left">
-        <div className="top-bar-item space-x-6">
-          <div className="top-bar-item">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="top-bar-icon"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
-              />
-            </svg>
-            <span>+49 162 9775400</span>
-          </div>
-          <div className="top-bar-item">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="top-bar-icon"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-            <span>Mon - Sun</span>
-          </div>
+      <section className="bg-ink">
+        <div className="mx-auto flex max-w-[84rem] flex-col items-start px-6 py-24 lg:px-10 lg:py-36">
+          <PackageX className="size-10 text-gold" aria-hidden="true" />
+          <h1 className="mt-8 font-display text-[clamp(2rem,5vw,3.5rem)] font-bold uppercase leading-[0.95] tracking-[-0.02em] text-bone">
+            Line not found
+          </h1>
+          <p className="mt-6 max-w-md text-[1.0625rem] leading-relaxed text-bone/55">
+            We have no line called &ldquo;{subcategory}&rdquo; on the book right now.
+          </p>
+          <Link
+            to="/categories"
+            className="group mt-9 inline-flex items-center gap-3 border border-gold bg-gold px-7 py-3.5 font-mono text-[0.75rem] uppercase tracking-[0.16em] text-ink transition-colors duration-300 hover:border-gold-lit hover:bg-gold-lit"
+          >
+            Back to the catalogue
+            <ArrowUpRight className="size-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" aria-hidden="true" />
+          </Link>
         </div>
-      </div>
-      <div className="top-bar-right">
-        <div className="top-bar-item space-x-4">
-          <div className="top-bar-item">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="top-bar-icon"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-              />
-            </svg>
-            <a href="mailto:info@asuppaltradinggmbh.com">info@asuppaltradinggmbh.com</a>
-          </div>
-          <div className="top-bar-item space-x-2">
-            <a href="#" aria-label="Twitter">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                <path d="M5.026 15c6.038 0 9.341-5.003 9.341-9.334 0-.14 0-.282-.006-.422A6.685 6.685 0 0 0 16 3.542a6.658 6.658 0 0 1-1.889.518 3.301 3.301 0 0 0 1.447-1.817 6.533 6.533 0 0 1-2.087.793A3.286 3.286 0 0 0 7.875 6.03a9.325 9.325 0 0 1-6.767-3.429 3.289 3.289 0 0 0 1.018 4.382A3.323 3.323 0 0 1 .64 6.575v.045a3.288 3.288 0 0 0 2.632 3.218 3.203 3.203 0 0 1-.865.115 3.23 3.23 0 0 1-.614-.057 3.283 3.283 0 0 0 3.067 2.277A6.588 6.588 0 0 1 .78 13.58a6.32 6.32 0 0 1-.78-.045A9.344 9.344 0 0 0 5.026 15z" />
-              </svg>
-            </a>
-            <a href="#" aria-label="Facebook">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                <path d="M16 8.049c0-4.446-3.582-8.05-8-8.05C3.58 0-.002 3.603-.002 8.05c0 4.017 2.926 7.347 6.75 7.951v-5.625h-2.03V8.05H6.75V6.275c0-2.017 1.195-3.131 3.022-3.131.876 0 1.791.157 1.791.157v1.98h-1.009c-.993 0-1.303.621-1.303 1.258v1.51h2.218l-.354 2.326H9.25V16c3.824-.604 6.75-3.934 6.75-7.951z" />
-              </svg>
-            </a>
-            <a href="#" aria-label="Instagram">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                <path d="M8 0C5.829 0 5.556.01 4.703.048 3.85.088 3.269.222 2.76.42a3.917 3.917 0 0 0-1.417.923A3.927 3.927 0 0 0 .42 2.76C.222 3.268.087 3.85.048 4.7.01 5.555 0 5.827 0 8.001c0 2.172.01 2.444.048 3.297.04.852.174 1.433.372 1.942.205.526.478.972.923 1.417.444.445.89.719 1.416.923.51.198 1.09.333 1.942.372C5.555 15.99 5.827 16 8 16s2.444-.01 3.298-.048c.851-.04 1.434-.174 1.943-.372a3.916 3.916 0 0 0 1.416-.923c.445-.445.718-.891.923-1.417.197-.509.332-1.09.372-1.942C15.99 10.445 16 10.173 16 8s-.01-2.445-.048-3.299c-.04-.851-.175-1.433-.372-1.941a3.926 3.926 0 0 0-.923-1.417A3.911 3.911 0 0 0 13.24.42c-.51-.198-1.092-.333-1.943-.372C10.443.01 10.172 0 7.998 0h.003zm-.717 1.442h.718c2.136 0 2.389.007 3.232.046.78.035 1.204.166 1.486.275.373.145.64.319.92.599.28.28.453.546.598.92.11.281.24.705.275 1.485.039.843.047 1.096.047 3.231s-.008 2.389-.047 3.232c-.035.78-.166 1.203-.275 1.485a2.47 2.47 0 0 1-.599.919c-.28.28-.546.453-.92.598-.28.11-.704.24-1.485.276-.843.038-1.096.047-3.232.047s-2.39-.009-3.233-.047c-.78-.036-1.203-.166-1.485-.276a2.478 2.478 0 0 1-.92-.598 2.48 2.48 0 0 1-.6-.92c-.109-.281-.24-.705-.275-1.485-.038-.843-.046-1.096-.046-3.233 0-2.136.008-2.388.046-3.231.036-.78.166-1.204.276-1.486.145-.373.319-.64.599-.92.28-.28.546-.453.92-.598.282-.11.705-.24 1.485-.276.738-.034 1.024-.044 2.515-.045v.002zm4.988 1.328a.96.96 0 1 0 0 1.92.96.96 0 0 0 0-1.92zm-4.27 1.122a4.109 4.109 0 1 0 0 8.217 4.109 4.109 0 0 0 0-8.217zm0 1.441a2.667 2.667 0 1 1 0 5.334 2.667 2.667 0 0 1 0-5.334z" />
-              </svg>
-            </a>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    {/* Logo Section */}
-    <div className="logo-section">
-  <div className="logo-container">
-    <div className="logo-image">
-      <img src="/asuppal/logo.jpg" alt="AS Uppal Logo" />
-    </div>
-  </div>
-</div>
-
-        <Header />
-        <main className="flex-grow bg-white flex items-center justify-center">
-          <p>Product not found</p>
-        </main>
-        <Footer />
-      </div>
-    )
+      </section>
+    );
   }
 
+  const specs = Object.entries(product.specifications);
+  const enquiry = `Enquiry: ${product.name}`;
+
   return (
-    <div className="flex flex-col min-h-screen">
-      <div className="top-bar">
-      <div className="top-bar-left">
-        <div className="top-bar-item space-x-6">
-          <div className="top-bar-item">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="top-bar-icon"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
-              />
-            </svg>
-            <span>+49 162 9775400</span>
-          </div>
-          <div className="top-bar-item">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="top-bar-icon"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-            <span>Mon - Sun</span>
-          </div>
+    <>
+      {/* -- Masthead -- */}
+      <section className="border-b border-ink-line bg-ink">
+        <div className="mx-auto max-w-[84rem] px-6 py-12 lg:px-10 lg:py-16">
+          <Reveal>
+            <nav aria-label="Breadcrumb">
+              <ol className="flex flex-wrap items-center gap-2.5 font-mono text-[0.6875rem] uppercase tracking-[0.18em] text-bone/40">
+                <li><Link to="/" className="transition-colors hover:text-gold">Home</Link></li>
+                <li aria-hidden="true">/</li>
+                <li><Link to="/categories" className="transition-colors hover:text-gold">Collections</Link></li>
+                <li aria-hidden="true">/</li>
+                <li className="text-gold">{product.name}</li>
+              </ol>
+            </nav>
+            <h1 className="mt-7 font-display text-[clamp(2rem,5.5vw,4.25rem)] font-bold uppercase leading-[0.92] tracking-[-0.02em] text-bone">
+              {product.name}
+            </h1>
+          </Reveal>
         </div>
-      </div>
-      <div className="top-bar-right">
-        <div className="top-bar-item space-x-4">
-          <div className="top-bar-item">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="top-bar-icon"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-              />
-            </svg>
-            <a href="mailto:sohaibuppal85@gmail.com">info@asuppaltradinggmbh.com</a>
-          </div>
-          <div className="top-bar-item space-x-2">
-            <a href="#" aria-label="Twitter">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                <path d="M5.026 15c6.038 0 9.341-5.003 9.341-9.334 0-.14 0-.282-.006-.422A6.685 6.685 0 0 0 16 3.542a6.658 6.658 0 0 1-1.889.518 3.301 3.301 0 0 0 1.447-1.817 6.533 6.533 0 0 1-2.087.793A3.286 3.286 0 0 0 7.875 6.03a9.325 9.325 0 0 1-6.767-3.429 3.289 3.289 0 0 0 1.018 4.382A3.323 3.323 0 0 1 .64 6.575v.045a3.288 3.288 0 0 0 2.632 3.218 3.203 3.203 0 0 1-.865.115 3.23 3.23 0 0 1-.614-.057 3.283 3.283 0 0 0 3.067 2.277A6.588 6.588 0 0 1 .78 13.58a6.32 6.32 0 0 1-.78-.045A9.344 9.344 0 0 0 5.026 15z" />
-              </svg>
-            </a>
-            <a href="#" aria-label="Facebook">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                <path d="M16 8.049c0-4.446-3.582-8.05-8-8.05C3.58 0-.002 3.603-.002 8.05c0 4.017 2.926 7.347 6.75 7.951v-5.625h-2.03V8.05H6.75V6.275c0-2.017 1.195-3.131 3.022-3.131.876 0 1.791.157 1.791.157v1.98h-1.009c-.993 0-1.303.621-1.303 1.258v1.51h2.218l-.354 2.326H9.25V16c3.824-.604 6.75-3.934 6.75-7.951z" />
-              </svg>
-            </a>
-            <a href="#" aria-label="Instagram">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                <path d="M8 0C5.829 0 5.556.01 4.703.048 3.85.088 3.269.222 2.76.42a3.917 3.917 0 0 0-1.417.923A3.927 3.927 0 0 0 .42 2.76C.222 3.268.087 3.85.048 4.7.01 5.555 0 5.827 0 8.001c0 2.172.01 2.444.048 3.297.04.852.174 1.433.372 1.942.205.526.478.972.923 1.417.444.445.89.719 1.416.923.51.198 1.09.333 1.942.372C5.555 15.99 5.827 16 8 16s2.444-.01 3.298-.048c.851-.04 1.434-.174 1.943-.372a3.916 3.916 0 0 0 1.416-.923c.445-.445.718-.891.923-1.417.197-.509.332-1.09.372-1.942C15.99 10.445 16 10.173 16 8s-.01-2.445-.048-3.299c-.04-.851-.175-1.433-.372-1.941a3.926 3.926 0 0 0-.923-1.417A3.911 3.911 0 0 0 13.24.42c-.51-.198-1.092-.333-1.943-.372C10.443.01 10.172 0 7.998 0h.003zm-.717 1.442h.718c2.136 0 2.389.007 3.232.046.78.035 1.204.166 1.486.275.373.145.64.319.92.599.28.28.453.546.598.92.11.281.24.705.275 1.485.039.843.047 1.096.047 3.231s-.008 2.389-.047 3.232c-.035.78-.166 1.203-.275 1.485a2.47 2.47 0 0 1-.599.919c-.28.28-.546.453-.92.598-.28.11-.704.24-1.485.276-.843.038-1.096.047-3.232.047s-2.39-.009-3.233-.047c-.78-.036-1.203-.166-1.485-.276a2.478 2.478 0 0 1-.92-.598 2.48 2.48 0 0 1-.6-.92c-.109-.281-.24-.705-.275-1.485-.038-.843-.046-1.096-.046-3.233 0-2.136.008-2.388.046-3.231.036-.78.166-1.204.276-1.486.145-.373.319-.64.599-.92.28-.28.546-.453.92-.598.282-.11.705-.24 1.485-.276.738-.034 1.024-.044 2.515-.045v.002zm4.988 1.328a.96.96 0 1 0 0 1.92.96.96 0 0 0 0-1.92zm-4.27 1.122a4.109 4.109 0 1 0 0 8.217 4.109 4.109 0 0 0 0-8.217zm0 1.441a2.667 2.667 0 1 1 0 5.334 2.667 2.667 0 0 1 0-5.334z" />
-              </svg>
-            </a>
-          </div>
-        </div>
-      </div>
-    </div>
+      </section>
 
-    {/* Logo Section */}
-    <div className="logo-section">
-  <div className="logo-container">
-    <div className="logo-image">
-      <img src="/asuppal/logo.jpg" alt="AS Uppal Logo" />
-    </div>
-  </div>
-</div>
-      <Header />
+      {/* -- Plate -- */}
+      <section className="bg-bone">
+        <div className="mx-auto grid max-w-[84rem] gap-12 px-6 py-14 lg:grid-cols-2 lg:gap-16 lg:px-10 lg:py-20">
+          <Reveal from="left">
+            <ProductGallery images={product.images} name={product.name} />
+          </Reveal>
 
-      <main className="flex-grow bg-white">
-        {/* Breadcrumb */}
-        <div className="container mx-auto py-4 px-4">
-          <div className="breadcrumb text-left">
-            <Link to="/" className="breadcrumb-link">
-              Home
-            </Link>
-            <span className="breadcrumb-separator">/</span>
-            <Link to="/categories" className="breadcrumb-link">
-              Collections
-            </Link>
-            <span className="breadcrumb-separator">/</span>
-            <Link to={`/categories/${subcategory?.split("-")[0]}`} className="breadcrumb-link">
-              {subcategory?.split("-")[0].toUpperCase()}
-            </Link>
-            <span className="breadcrumb-separator">/</span>
-            <span className="breadcrumb-current">{product.name}</span>
-          </div>
-        </div>
+          <Reveal from="right">
+            <SpecLabel tone="light">Line detail</SpecLabel>
 
-        {/* Product Detail */}
-        <div className="product-container">
-          {/* Left Column - Images */}
-          <div className="product-images">
-            <div className="main-image">
-              <img src={product.images[activeImage] || "/placeholder.svg"} alt={product.name} />
+            <p className="mt-6 text-[1.0625rem] leading-relaxed text-slate">
+              {product.description}
+            </p>
+
+            {/* Price is quoted, not listed - say so plainly. */}
+            <div className="mt-8 border border-bone-line bg-white p-6">
+              <p className="font-mono text-[0.625rem] uppercase tracking-[0.2em] text-gold-deep">
+                Indicative pricing
+              </p>
+              <p className="mt-2 font-display text-2xl font-bold uppercase tracking-[-0.01em]">
+                {product.price}
+              </p>
+              <p className="mt-2 text-[0.875rem] leading-relaxed text-slate">
+                Final price depends on grade, volume and destination port.
+              </p>
             </div>
-            <div className="thumbnail-container">
-              {product.images.map((image: string, index: number) => (
+
+            <div className="mt-8 flex flex-wrap gap-4">
+              <Link
+                to="/contact"
+                className="group inline-flex items-center gap-3 border border-ink bg-ink px-7 py-3.5 font-mono text-[0.75rem] uppercase tracking-[0.16em] text-bone transition-colors duration-300 hover:border-gold hover:bg-gold hover:text-ink"
+              >
+                Request a quote
+                <ArrowUpRight className="size-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" aria-hidden="true" />
+              </Link>
+              <a
+                href={`${CONTACT.whatsapp}?text=${encodeURIComponent(enquiry)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-3 border border-ink/20 px-7 py-3.5 font-mono text-[0.75rem] uppercase tracking-[0.16em] text-ink transition-colors duration-300 hover:border-ink"
+              >
+                <MessageCircle className="size-4" aria-hidden="true" />
+                Ask on WhatsApp
+              </a>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* -- Specification plate. A buyer decides from this table, so it
+             carries the manifest treatment rather than sitting in prose. -- */}
+      <section className="border-t border-bone-line bg-bone-dim/50">
+        <div className="mx-auto max-w-[84rem] px-6 py-16 lg:px-10 lg:py-24">
+          <Reveal className="max-w-2xl">
+            <SpecLabel tone="light">Specification</SpecLabel>
+            <h2 className="mt-6 font-display text-[clamp(1.75rem,4vw,2.75rem)] font-bold uppercase leading-[0.98] tracking-[-0.015em]">
+              What you are buying
+            </h2>
+          </Reveal>
+
+          <Reveal className="mt-10">
+            <dl className="grid gap-px border border-bone-line bg-bone-line sm:grid-cols-2">
+              {specs.map(([key, value]) => (
                 <div
-                  key={index}
-                  className={`thumbnail ${activeImage === index ? "active" : ""}`}
-                  onClick={() => setActiveImage(index)}
+                  key={key}
+                  className="flex flex-col gap-1.5 bg-white p-6 sm:flex-row sm:items-baseline sm:justify-between sm:gap-8"
                 >
-                  <img src={image || "/placeholder.svg"} alt={`${product.name} thumbnail ${index + 1}`} />
+                  <dt className="font-mono text-[0.6875rem] uppercase tracking-[0.18em] text-gold-deep">
+                    {key}
+                  </dt>
+                  <dd className="font-mono text-[0.9375rem] text-ink sm:text-right">
+                    {value}
+                  </dd>
                 </div>
               ))}
-            </div>
-          </div>
+            </dl>
+          </Reveal>
 
-          {/* Right Column - Details */}
-          <div className="product-details">
-            <h1 className="product-title">{product.name}</h1>
-            <div className="product-price">{product.price}</div>
-            <div className="product-description">{product.description}</div>
-
-            <div className="product-meta">
-              <h3 className="font-bold text-lg mb-2">Specifications:</h3>
-              {Object.entries(product.specifications).map(([key, value]: [string, any]) => (
-                <div key={key} className="meta-item">
-                  <span className="meta-label">{key}:</span>
-                  <span className="meta-value">{value}</span>
-                </div>
-              ))}
-            </div>
-
-            <Link to="/contact" className="inquiry-button">
-              Make an Inquiry
-            </Link>
-          </div>
+          <Reveal className="mt-10">
+            <p className="font-mono text-[0.75rem] leading-relaxed tracking-[0.04em] text-slate">
+              Need a grade or volume that is not listed?{" "}
+              <a
+                href={`mailto:${CONTACT.email}?subject=${encodeURIComponent(enquiry)}`}
+                className="border-b border-gold/50 text-ink transition-colors hover:border-gold hover:text-gold-deep"
+              >
+                Write to the desk
+              </a>{" "}
+              and we will tell you what we can source.
+            </p>
+          </Reveal>
         </div>
-      </main>
-
-      <Footer />
-    </div>
-  )
+      </section>
+    </>
+  );
 }
-
-export default ProductDetailPage
