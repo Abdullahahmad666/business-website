@@ -46,16 +46,24 @@ export type RouteMeta = {
   path: string;
   title: string;
   ogTitle: string;
+  /** <meta name="description"> — the search-result budget, up to ~158. */
   description: string;
+  /** og: and twitter: description — the tighter social budget, up to 125. */
+  socialDescription: string;
   imageAlt: string;
   card: CardCopy;
 };
 
 /* ── Text fitting ──────────────────────────────────────────────────────────
-   Google truncates a description near 160 characters and a title near 60.
-   Cutting mid-word looks like a bug, so both clamp on a word boundary. */
+   Two budgets, because the surfaces differ. Google truncates a description
+   near 160 characters and a title near 60. A link preview is tighter still:
+   X and most mobile clients show about 125 characters of og:description, so
+   the search copy would be cut off mid-sentence in a chat window.
+
+   Cutting mid-word looks like a bug, so everything clamps on a boundary. */
 
 const DESCRIPTION_MAX = 158;
+const SOCIAL_MAX = 125;
 const TITLE_MAX = 60;
 
 function tidy(text: string): string {
@@ -74,13 +82,50 @@ function clamp(text: string, max: number): string {
 }
 
 /**
+ * Shortens to whole sentences for the social budget, falling back to a
+ * word-boundary cut only when the first sentence is already too long.
+ * A card ending "…shipped world…" reads like a bug; one ending on a full
+ * stop reads like it was written that way.
+ */
+function social(text: string): string {
+  const flat = tidy(text);
+  if (flat.length <= SOCIAL_MAX) return flat;
+
+  const sentences = flat.match(/[^.!?]+[.!?]+(?:\s|$)/g) ?? [];
+  let kept = "";
+  for (const sentence of sentences) {
+    if ((kept + sentence).trim().length > SOCIAL_MAX) break;
+    kept += sentence;
+  }
+  kept = kept.trim();
+
+  // Below ~60 characters a lone opening sentence says too little to be worth
+  // the whole-sentence trick; take the longer clamped version instead.
+  return kept.length >= 60 ? kept : clamp(flat, SOCIAL_MAX);
+}
+
+/**
+ * Length as it appears in the HTML source. "&" costs five characters once
+ * escaped, and both search-console-style checkers and our own test measure
+ * the file, not the decoded string — a 59-character title with one ampersand
+ * is reported as 63 and flagged.
+ */
+function markupLength(text: string): number {
+  return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;")
+    .length;
+}
+
+/**
  * "Copper Scrap" -> "Copper Scrap | A.S. Uppal Trading GmbH".
  * The subject is clamped so the suffix always survives; a result that ends
- * "...Trad" identifies nobody.
+ * "...Trad" identifies nobody. The budget is spent in escaped characters,
+ * conservatively: a subject carrying entities gets charged for all of them
+ * even if the clamp later cuts some away.
  */
 function pageTitle(subject: string): string {
   const suffix = ` | ${SITE.name}`;
-  return clamp(subject, TITLE_MAX - suffix.length) + suffix;
+  const entityOverhead = markupLength(subject) - subject.length;
+  return clamp(subject, TITLE_MAX - markupLength(suffix) - entityOverhead) + suffix;
 }
 
 /** The catalogue shouts ("USED CARS", "Compressor SCRAP"); titles should not. */
@@ -123,10 +168,14 @@ function altFor(subject: string, detail: string): string {
 const STATIC: RouteMeta[] = [
   {
     path: "/",
-    title: "A.S. Uppal Trading GmbH | Scrap Metal, Cars, Laptops & Nuts",
+    // No ampersand on purpose: "&" is five characters in the markup, which
+    // pushed this one title from 59 to 63 and over the limit.
+    title: "A.S. Uppal Trading GmbH | Scrap Metal, Cars, Laptops, Nuts",
     ogTitle: "A.S. Uppal Trading GmbH — Bulk Commodity Trading, Mainz",
     description:
       "A.S. Uppal Trading GmbH trades scrap metal, used cars, laptops, nuts and cooking oil in bulk from Mainz, Germany — sorted, graded and shipped worldwide.",
+    socialDescription:
+      "Scrap metal, used cars, laptops, nuts and cooking oil, traded in bulk from Mainz, Germany.",
     imageAlt: altFor(
       "A.S. Uppal Trading GmbH",
       "scrap metal, used cars, laptops, nuts and cooking oil traded in bulk"
@@ -144,6 +193,8 @@ const STATIC: RouteMeta[] = [
     ogTitle: "A trading desk, not a catalogue — A.S. Uppal Trading GmbH",
     description:
       "A.S. Uppal Trading GmbH buys and sells in bulk out of a warehouse in Mainz, dealing only in goods we can inspect, price and load ourselves.",
+    socialDescription:
+      "We buy and sell in bulk out of a warehouse in Mainz, dealing only in goods we can inspect, price and load ourselves.",
     imageAlt: altFor("About A.S. Uppal Trading GmbH", "a bulk trading desk run out of a warehouse in Mainz"),
     card: {
       kicker: "About Us",
@@ -158,6 +209,8 @@ const STATIC: RouteMeta[] = [
     ogTitle: "Collections — Five classes of goods, moved by the container",
     description:
       "Five classes of goods moved in container quantities out of Mainz: scrap metal, nuts, cars, laptops and cooking oil. Open a class to see the lines we carry.",
+    socialDescription:
+      "Five classes of goods moved in container quantities out of Mainz: scrap metal, nuts, cars, laptops and cooking oil.",
     imageAlt: altFor("The A.S. Uppal catalogue", "five classes of goods moved in container quantities"),
     card: {
       kicker: "Collections",
@@ -175,6 +228,8 @@ const STATIC: RouteMeta[] = [
     title: pageTitle("Contact & Quotes"),
     ogTitle: "Request a quote — A.S. Uppal Trading GmbH, Mainz",
     description: `Tell us the grade, volume and destination port and we will quote against it. A.S. Uppal Trading GmbH, ${CONTACT.street}, ${CONTACT.postcode} ${CONTACT.city}.`,
+    socialDescription:
+      "Tell us the grade, volume and destination port and we will quote against it. Photos or a packing list help too.",
     imageAlt: altFor("Contact A.S. Uppal Trading GmbH", "request a bulk quote by phone, email or WhatsApp"),
     card: {
       kicker: "Contact",
@@ -201,6 +256,7 @@ function categoryRoutes(): RouteMeta[] {
       title: pageTitle(subject),
       ogTitle: `${cls.name} — ${cls.detail}`,
       description: clamp(`${cls.blurb} ${entry.description}`, DESCRIPTION_MAX),
+      socialDescription: social(`${cls.blurb} ${entry.description}`),
       imageAlt: altFor(cls.name, cls.detail),
       card: {
         kicker: "Class",
@@ -246,6 +302,7 @@ function productRoutes(): RouteMeta[] {
         title: pageTitle(parent ? `${name} — ${parent.className}` : name),
         ogTitle: `${name} — ${SITE.name}`,
         description: clamp(product.description, DESCRIPTION_MAX),
+        socialDescription: social(product.description),
         imageAlt: altFor(name, parent ? `${parent.className} traded in bulk` : "traded in bulk"),
         card: {
           kicker: parent ? parent.className : "Catalogue",

@@ -60,7 +60,9 @@ export function seoBlock(route, site, cardPath, indent = "    ") {
     `<meta property="og:type" content="website" />`,
     `<meta property="og:site_name" content="${esc(site.name)}" />`,
     `<meta property="og:title" content="${esc(route.ogTitle)}" />`,
-    `<meta property="og:description" content="${esc(route.description)}" />`,
+    // The short form, not route.description: a link preview shows about 125
+    // characters, so the search copy gets cut mid-sentence in a chat window.
+    `<meta property="og:description" content="${esc(route.socialDescription)}" />`,
     `<meta property="og:url" content="${esc(url)}" />`,
     `<meta property="og:locale" content="${esc(site.locale)}" />`,
     `<meta property="og:image" content="${esc(image)}" />`,
@@ -71,7 +73,7 @@ export function seoBlock(route, site, cardPath, indent = "    ") {
     ``,
     `<meta name="twitter:card" content="summary_large_image" />`,
     `<meta name="twitter:title" content="${esc(route.ogTitle)}" />`,
-    `<meta name="twitter:description" content="${esc(route.description)}" />`,
+    `<meta name="twitter:description" content="${esc(route.socialDescription)}" />`,
     `<meta name="twitter:image" content="${esc(image)}" />`,
     `<meta name="twitter:image:alt" content="${esc(route.imageAlt)}" />`,
   ];

@@ -33,11 +33,36 @@ test("every class and product in the catalogue has a route", () => {
   }
 });
 
-test("titles and descriptions stay inside what search results render", () => {
+/** How a string is counted once it is escaped into the HTML file. */
+const markupLength = (text: string) =>
+  text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;")
+    .length;
+
+test("titles stay inside what search results render, measured as markup", () => {
   for (const route of ROUTES) {
-    expect(route.title.length, route.path).toBeLessThanOrEqual(60);
+    // Measured escaped, not decoded: one "&" costs five characters in the
+    // file, and that is what length checkers report. The homepage title read
+    // 59 decoded and was flagged at 63.
+    expect(markupLength(route.title), route.path).toBeLessThanOrEqual(60);
+  }
+});
+
+test("descriptions fit the search budget and the tighter social one", () => {
+  for (const route of ROUTES) {
     expect(route.description.length, route.path).toBeLessThanOrEqual(160);
     expect(route.description.length, route.path).toBeGreaterThan(50);
+
+    // Link previews show roughly 125 characters and truncate the rest.
+    expect(route.socialDescription.length, route.path).toBeLessThanOrEqual(125);
+    expect(route.socialDescription.length, route.path).toBeGreaterThan(40);
+  }
+});
+
+test("the social description does not trail off mid-sentence", () => {
+  for (const route of ROUTES) {
+    // An ellipsis means the sentence-preferring shortener had nothing short
+    // enough to keep whole — worth a hand-written line for that route.
+    expect(route.socialDescription, route.path).not.toMatch(/…$/);
   }
 });
 
