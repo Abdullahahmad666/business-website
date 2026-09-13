@@ -1,15 +1,18 @@
 <!doctype html>
 <meta charset="utf-8">
 <!--
-  Source for /public/og-card.png — the 1200x630 image every link preview
-  (Facebook, LinkedIn, X, Slack, Discord, WhatsApp) renders. It is a build
-  input, not a page the site serves; nothing links to it.
+  Template for the 1200×630 link-preview cards under /public/og — the image
+  Facebook, LinkedIn, X, Slack, Discord and WhatsApp render when a page is
+  shared. A build input, not a page the site serves; nothing links to it.
 
-  Regenerate after editing, with node_modules installed so the brand faces
-  resolve, then commit the PNG. Both paths must be absolute — headless Chrome
-  reads a bare relative argument as a hostname, not a file:
+  The copy comes from the query string, so one template produces every card:
 
-    chrome --headless --disable-gpu --hide-scrollbars --force-device-scale-factor=1 --window-size=1200,630 --screenshot=<repo>/public/og-card.png file:///<repo>/tools/og-card.html
+    ?kicker=Scrap&headline=Copper%20Scrap&sub=Price%20Varying&line=8%20listings
+
+  Opening it with no query shows the homepage card. Run `npm run cards` to
+  regenerate all of them (tools/build-cards.mjs drives headless Chrome over
+  every route in src/data/seo.ts) and commit the PNGs — the deploy builder
+  has no browser, so these cannot be generated on Vercel.
 
   Colours and faces are copied from src/index.css; keep them in step.
 -->
@@ -33,10 +36,7 @@
 
   :root {
     --ink: #0a0a0b;
-    --ink-raised: #141417;
-    --ink-line: #26262c;
     --gold: #d4af37;
-    --gold-lit: #f0c75e;
     --gold-deep: #8a6f1e;
     --bone: #f6f4ef;
     --slate: #6f6f78;
@@ -63,17 +63,22 @@
     background-size: 60px 60px;
   }
 
-  /* Struck light from the upper right. */
+  /* Light falling from above. Vertical on purpose: each row of the image is
+     then one flat colour, which PNG compresses hard. The radial glow this
+     replaces looked slightly better and cost 4.3 MB across 24 cards against
+     1.8 MB for this — the cards are thumbnails in a chat window, and the
+     difference is invisible at the size anyone actually sees them. */
   .glow {
     position: absolute; inset: 0;
-    background: radial-gradient(120% 90% at 88% 8%, rgba(212,175,55,0.16), transparent 58%);
+    background: linear-gradient(
+      to bottom,
+      rgba(212,175,55,0.11) 0%,
+      rgba(212,175,55,0.03) 46%,
+      transparent 82%
+    );
   }
 
-  .frame {
-    position: absolute;
-    inset: 32px;
-    border: 1px solid rgba(212,175,55,0.22);
-  }
+  .frame { position: absolute; inset: 32px; border: 1px solid rgba(212,175,55,0.22); }
 
   .plate {
     position: absolute;
@@ -90,10 +95,10 @@
     align-items: center;
     justify-content: space-between;
     font-size: 15px;
+    font-weight: 500;
     letter-spacing: 0.34em;
     text-transform: uppercase;
     color: var(--gold);
-    font-weight: 500;
   }
   .rail .right { color: var(--slate); letter-spacing: 0.28em; }
 
@@ -115,13 +120,14 @@
     color: var(--gold);
   }
 
-  .name {
+  /* Headline sizing is set by the fit() pass below, not here — the copy runs
+     from "Oil" to a full sentence and no single size serves both. */
+  .headline {
     font-family: "Archivo Variable", sans-serif;
     font-stretch: 125%;
     font-variation-settings: "wdth" 125;
     font-weight: 700;
     text-transform: uppercase;
-    font-size: 78px;
     line-height: 0.94;
     letter-spacing: 0.005em;
     color: var(--bone);
@@ -136,17 +142,14 @@
     color: var(--gold);
   }
 
-  /* ── Commodity line ─────────────────────────────────── */
-  .book {
-    display: flex;
-    align-items: center;
-    gap: 16px;
+  .line {
+    margin-top: 44px;
     font-size: 17px;
     letter-spacing: 0.16em;
     text-transform: uppercase;
     color: #a8a4a0;
   }
-  .book .dot { color: var(--gold-deep); }
+  .line .sep { color: var(--gold-deep); }
 
   /* ── Bottom rule + footer ───────────────────────────── */
   .rule {
@@ -163,10 +166,10 @@
     text-transform: uppercase;
     color: var(--slate);
   }
-  /* Deliberately a phone number, not a URL: the card is the same artwork
-     whatever host it is served from, and the company has no live domain of
-     its own yet. Number tracks CONTACT.tel in src/data/company.ts. */
-  .foot .site { color: var(--bone); letter-spacing: 0.14em; }
+  /* Deliberately a phone number and not a URL: the artwork is the same
+     whatever host serves it, and the company has no domain of its own yet.
+     Tracks CONTACT.tel in src/data/company.ts. */
+  .foot .tel { color: var(--bone); letter-spacing: 0.14em; }
 </style>
 
 <div class="grid"></div>
@@ -175,33 +178,74 @@
 
 <div class="plate">
   <div class="rail">
-    <span>Mainz &middot; Germany</span>
+    <span id="kicker"></span>
     <span class="right">Import &nbsp;/&nbsp; Export</span>
   </div>
 
   <div>
     <div class="mark">
       <div class="monogram">AS</div>
-      <div>
-        <div class="name">A.S. Uppal<br>Trading GmbH</div>
-        <div class="sub">Bulk Commodity Trading</div>
+      <div id="column">
+        <div class="headline" id="headline"></div>
+        <div class="sub" id="sub"></div>
       </div>
     </div>
-
-    <div class="book" style="margin-top:44px">
-      <span>Scrap Metal</span><span class="dot">/</span>
-      <span>Used Cars</span><span class="dot">/</span>
-      <span>Laptops</span><span class="dot">/</span>
-      <span>Nuts</span><span class="dot">/</span>
-      <span>Cooking Oil</span>
-    </div>
+    <div class="line" id="line"></div>
   </div>
 
   <div>
     <div class="rule"></div>
     <div class="foot">
-      <span class="site">+49 162 9775400</span>
+      <span class="tel">+49 162 9775400</span>
       <span>Sorted &middot; Graded &middot; Shipped</span>
     </div>
   </div>
 </div>
+
+<script>
+  const params = new URLSearchParams(location.search);
+  const copy = {
+    kicker: params.get("kicker") || "Mainz · Germany",
+    headline: params.get("headline") || "A.S. Uppal Trading GmbH",
+    sub: params.get("sub") || "Bulk Commodity Trading",
+    line: params.get("line") || "Scrap Metal / Used Cars / Laptops / Nuts / Cooking Oil",
+  };
+
+  document.getElementById("kicker").textContent = copy.kicker;
+  document.getElementById("headline").textContent = copy.headline;
+  document.getElementById("sub").textContent = copy.sub;
+
+  // Tint the separators in the bottom list without letting copy inject markup.
+  const line = document.getElementById("line");
+  copy.line.split("/").forEach((part, i) => {
+    if (i > 0) {
+      const sep = document.createElement("span");
+      sep.className = "sep";
+      sep.textContent = " / ";
+      line.append(sep);
+    }
+    line.append(document.createTextNode(part.trim()));
+  });
+
+  /**
+   * Shrink the headline until it fits the space above the sub-line. Copy runs
+   * from "Oil" to a full sentence, so the largest size that still fits beats
+   * a fixed size per route that would need hand tuning on every rename.
+   *
+   * This MUST wait for document.fonts.ready. Measuring against the fallback
+   * face reports a shorter headline than Archivo Expanded actually sets, and
+   * the fitter then leaves it too large — it overflows the plate and lands on
+   * top of the footer rule, which is exactly what the first run of these
+   * cards did.
+   */
+  function fit() {
+    const el = document.getElementById("headline");
+    const MAX_HEIGHT = 268;
+    for (let size = 78; size >= 30; size -= 2) {
+      el.style.fontSize = size + "px";
+      if (el.scrollHeight <= MAX_HEIGHT) return;
+    }
+  }
+
+  document.fonts.ready.then(fit);
+</script>
